@@ -34,14 +34,14 @@ module.exports = async (req, res) => {
 
         connection.query(insertQuery, (err, rows) => {
             if (err) {
-                return res.json({
+                return res.status(400).json({
                     success: false,
                     data: null,
                     error: err.message,
                 });
             }
 
-            res.json({
+            res.status(200).json({
                 success: true,
                 message: "User has been created",
             });

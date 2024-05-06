@@ -1,9 +1,60 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mood_palette/screen/auth/login.dart';
 import 'package:mood_palette/widget/loginbutton.dart';
 
 class SignupPage extends StatelessWidget {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _register(BuildContext context) async {
+    final String username = _usernameController.text;
+    final String password = _passwordController.text;
+
+    // Make sure username and password are not empty
+    if (username.isEmpty || password.isEmpty) {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Username and password are required.'),
+        ),
+      );
+      return;
+    }
+
+    // Make HTTP POST request to signup endpoint
+      // Make HTTP POST request to signup endpoint
+    final url = Uri.parse('http://localhost:3000/signup');
+    final response = await http.post(
+      url,
+      body: jsonEncode({'username': username, 'password': password}),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      // Signup successful
+      // Navigate to login page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    } else {
+      // Signup failed
+      // Show error message
+      _showSnackBar(context, 'Signup failed. Please try again.');
+    }
+  }
+
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -79,6 +130,7 @@ class SignupPage extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.all(15.0),
                             child: TextFormField(
+                              controller: _usernameController,
                               decoration: InputDecoration(
                                 hintText: 'Username',
                                 prefixIcon: Icon(Icons.person), // User icon
@@ -89,6 +141,7 @@ class SignupPage extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.all(15.0),
                             child: TextFormField(
+                              controller: _passwordController,
                               decoration: InputDecoration(
                                 hintText: 'Password',
                                 prefixIcon: Icon(Icons.lock), // Lock icon
@@ -101,17 +154,17 @@ class SignupPage extends StatelessWidget {
                             padding: const EdgeInsets.all(20.0),
                             child: MyElevatedButton(
                               width: double.infinity,
-                              onPressed: () {},
+                              onPressed: () => _register(context),
                               borderRadius: BorderRadius.circular(50),
                               child: Text(
                                 'REGISTER',
                                 style: GoogleFonts.poppins(
                                   textStyle: TextStyle(
                                     fontSize: 20,
-                                    color: Colors.white
+                                    color: Colors.white,
                                   ),
+                                ),
                               ),
-                            ),
                             ),
                           ),
                           SizedBox(height: 20),
