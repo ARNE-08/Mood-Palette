@@ -18,14 +18,14 @@ module.exports = (req, res) => {
 
         numRows = rows.length;
         if (numRows == 0) {
-            res.json({
+            return res.status(400).json({
                 success: false,
                 message: "user not found in the system",
             });
         } else {
             bcrypt.compare(password, rows[0].hashed_password, (err, valid) => {
                 if (err) {
-                    return res.json({
+                    return res.status(400).json({
                         success: false,
                         message: "Error comparing passwords",
                     });
@@ -41,13 +41,13 @@ module.exports = (req, res) => {
                     );
                     res.cookie("userToken", token);
 
-                    res.json({
+                    res.status(200).json({
                         success: true,
                         message: "Login credential is correct",
                         data: rows[0] && rows[0].username,
                     });
                 } else {
-                    res.json({
+                    res.status(400).json({
                         success: true,
                         message: "Login credential is incorrect",
                     });

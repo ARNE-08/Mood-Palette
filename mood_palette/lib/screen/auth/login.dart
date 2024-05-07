@@ -2,11 +2,69 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mood_palette/widget/loginbutton.dart';
 import 'package:mood_palette/screen/auth/signup.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextEditingController _usernameController = TextEditingController();
+    final TextEditingController _passwordController = TextEditingController();
+    
+    Future<void> _login(BuildContext context) async {
+      final String username = _usernameController.text;
+      final String password = _passwordController.text;
+
+      void _showSnackBar(BuildContext context, String message) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message),
+          ),
+        );
+      }
+
+      // Make sure username and password are not empty
+      if (username.isEmpty || password.isEmpty) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Username and password are required.'),
+          ),
+        );
+        return;
+      }
+
+      // Make HTTP POST request to signup endpoint
+        // Make HTTP POST request to signup endpoint
+      final url = Uri.parse('http://localhost:3000/login');
+      final response = await http.post(
+        url,
+        body: jsonEncode({'username': username, 'password': password}),
+        headers: {'Content-Type': 'application/json'},
+      );
+      print("----> ${response.body}");
+
+      if (response.statusCode == 200) {
+        // Signup successful
+        _showSnackBar(context, 'Login successful. Redirecting to home page.');
+        // Navigate to login page
+        Navigator.pushNamed(context, '/');
+      } else {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        if (responseData.containsKey('message') && responseData['message'] == 'Error comparing passwords') {
+            // Show Snackbar for incorrect password
+            _showSnackBar(context, 'Incorrect password. Please try again.');
+        } else if (responseData.containsKey('message') && responseData['message'] == 'user not found in the system') {
+            // Show Snackbar for incorrect password
+            _showSnackBar(context, 'This account does not exist. Please sign up.');
+        }
+        else {
+            // Show generic error message
+            _showSnackBar(context, 'Login failed. Please try again.');
+        }
+      }
+    }
 
     return Scaffold(
       body: Container(
@@ -79,6 +137,7 @@ class LoginPage extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.all(15.0),
                             child: TextFormField(
+                              controller: _usernameController,
                               decoration: InputDecoration(
                                 hintText: 'Username',
                                 prefixIcon: Icon(Icons.person), // User icon
@@ -89,6 +148,7 @@ class LoginPage extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.all(15.0),
                             child: TextFormField(
+                              controller: _passwordController,
                               decoration: InputDecoration(
                                 hintText: 'Password',
                                 prefixIcon: Icon(Icons.lock), // Lock icon
@@ -101,9 +161,7 @@ class LoginPage extends StatelessWidget {
                             padding: const EdgeInsets.all(20.0),
                             child: MyElevatedButton(
                               width: double.infinity,
-                              onPressed: () {
-                                //TO HOME
-                              },
+                              onPressed: ()  => _login(context),
                               borderRadius: BorderRadius.circular(50),
                               child: Text(
                                 'LOGIN',

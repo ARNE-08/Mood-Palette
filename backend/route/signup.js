@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
 
         if (rows.length > 0) {
             // Username already exists
-            return res.json({
+            return res.status(400).json({
                 success: false,
                 data: null,
                 error: "Account is already exists",
