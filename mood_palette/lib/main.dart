@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mood_palette/screen/auth/login.dart';
+import 'package:mood_palette/screen/statistic/stat.dart';
 
 void main() {
   runApp(MyApp());
@@ -11,13 +12,15 @@ class MyApp extends StatelessWidget {
     // var colorScheme = Color.fromRGBO(255, 254, 234, 1);
     return MaterialApp(
       title: 'Mood Palette',
+
       theme: ThemeData(
-        //   colorScheme: ColorScheme.fromSwatch(
-        //     backgroundColor: colorScheme, // Set the background color
-        //   // Add more properties such as secondarySwatch, errorColor, etc. if needed
-        // ),
-      ),
-      home: LoginPage(), // Open the login page when the app starts
+          //   colorScheme: ColorScheme.fromSwatch(
+          //     backgroundColor: colorScheme, // Set the background color
+          //   // Add more properties such as secondarySwatch, errorColor, etc. if needed
+          // ),
+          ),
+      //home: LoginPage(), // Open the login page when the app starts
+      home: StatPage(), // Open the statistic page when the app starts
     );
   }
 }
