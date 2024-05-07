@@ -8,18 +8,21 @@ class StatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Map<String, double> dataMap = {
-      "Angry": 1,
-      "Excited": 2,
-      "Happy": 3,
-      "Uncomfortable": 4,
-      "Confused": 5,
-      "Chill": 6,
-      "Calm": 7,
-      "Embarrassed": 8,
-      "Bored": 9,
-      "Sad": 10,
-      "Worried": 11,
+      "Angry": 3,
+      "Excited": 1,
+      "Happy": 2,
+      "Uncomfortable": 3,
+      "Confused": 4,
+      "Chill": 5,
+      "Calm": 6,
+      "Embarrassed": 7,
+      "Bored": 8,
+      "Sad": 11,
+      "Worried": 10,
     };
+
+    double sum = dataMap.values.reduce((value, element) => value + element);
+    final normalizedDataMap = dataMap.map((key, value) => MapEntry(key, (value / sum) * 100));
 
     final List<Color> colorList = [
       const Color.fromRGBO(255, 0, 34, 1),
@@ -40,7 +43,8 @@ class StatPage extends StatelessWidget {
         backgroundColor: Color.fromRGBO(255, 254, 234, 1), // Set background color to match the container
         elevation: 0, // Remove the elevation
         title: Padding(
-          padding: const EdgeInsets.only(top: 30), // Adjust top padding to move the text down
+          padding: const EdgeInsets.only(
+              top: 30), // Adjust top padding to move the text down
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -85,31 +89,42 @@ class StatPage extends StatelessWidget {
                     ],
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(30),
                     child: AspectRatio(
                       aspectRatio: 0.6,
                       child: PieChart(
-                        dataMap: dataMap,
+                        dataMap: normalizedDataMap,
+                        animationDuration: Duration(milliseconds: 800),
+                        chartLegendSpacing: 50,
+                        chartRadius: MediaQuery.of(context).size.width / 2,
                         colorList: colorList,
+                        initialAngleInDegree: 0,
                         chartType: ChartType.ring,
+                        ringStrokeWidth: 70,
                         chartValuesOptions: ChartValuesOptions(
                           showChartValues: true,
                           showChartValuesInPercentage: true,
                           showChartValueBackground: false,
                           showChartValuesOutside: true,
                           decimalPlaces: 0,
+                          chartValueStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: GoogleFonts.poppins().fontFamily,
+                          ),
                         ),
                         legendOptions: LegendOptions(
                           showLegends: true,
                           legendPosition: LegendPosition.bottom,
                           legendShape: BoxShape.circle,
                           legendTextStyle: TextStyle(
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w400,
                             fontSize: 12,
+                            fontFamily: GoogleFonts.poppins().fontFamily,
                           ),
                         ),
                       ),
-                          
                     ),
                   ),
                 ),
