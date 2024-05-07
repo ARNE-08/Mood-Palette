@@ -47,6 +47,7 @@ app.get("/", (req, res) => {
 
 app.post("/signup", require("./route/signup"));
 app.post("/login", require("./route/login"));
+app.post("/editusername", require("./route/editusername"));
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
