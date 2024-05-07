@@ -85,9 +85,9 @@ class StatPage extends StatelessWidget {
                     ],
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(20),
                     child: AspectRatio(
-                      aspectRatio: 1,
+                      aspectRatio: 0.6,
                       child: PieChart(
                         dataMap: dataMap,
                         colorList: colorList,
@@ -97,8 +97,19 @@ class StatPage extends StatelessWidget {
                           showChartValuesInPercentage: true,
                           showChartValueBackground: false,
                           showChartValuesOutside: true,
+                          decimalPlaces: 0,
+                        ),
+                        legendOptions: LegendOptions(
+                          showLegends: true,
+                          legendPosition: LegendPosition.bottom,
+                          legendShape: BoxShape.circle,
+                          legendTextStyle: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
+                          
                     ),
                   ),
                 ),
