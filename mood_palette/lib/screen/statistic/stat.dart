@@ -34,7 +34,7 @@ class _StatPageState extends State<StatPage> {
     "Confused": 4,
     "Chill": 5,
     "Calm": 2,
-    "Embarrassed": 7,
+    "Embarrassed": 0,
     "Bored": 3,
     "Sad": 1,
     "Worried": 1,
@@ -103,12 +103,13 @@ class _StatPageState extends State<StatPage> {
                   children: [
                     SizedBox(height: 40),
                     Container(
+                      width: 215,
+                      height: 35,
                       decoration: BoxDecoration(
                         color: Color.fromRGBO(91, 188, 255, 1),
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+                      padding: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -126,7 +127,7 @@ class _StatPageState extends State<StatPage> {
                           Text(
                             months[currentMonthIndex],
                             style: TextStyle(
-                              fontSize: 30,
+                              fontSize: 20,
                               fontFamily: GoogleFonts.singleDay().fontFamily,
                               fontWeight: FontWeight.normal,
                               color: Colors.white,
@@ -146,43 +147,56 @@ class _StatPageState extends State<StatPage> {
                         ],
                       ),
                     ),
-
-                    // Adjust spacing here
-                    AspectRatio(
-                      aspectRatio: 1,
-                      child: PieChart(
-                        dataMap: normalizedDataMap,
-                        animationDuration: Duration(milliseconds: 800),
-                        chartLegendSpacing: 10,
-                        chartRadius: MediaQuery.of(context).size.width / 2,
-                        colorList: colorList,
-                        initialAngleInDegree: 0,
-                        chartType: ChartType.ring,
-                        ringStrokeWidth: 70,
-                        chartValuesOptions: ChartValuesOptions(
-                          showChartValues: false,
-                          showChartValuesInPercentage: true,
-                          showChartValueBackground: false,
-                          showChartValuesOutside: true,
-                          decimalPlaces: 0,
-                          chartValueStyle: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: GoogleFonts.poppins().fontFamily,
+                    SizedBox(height: 20), // Adjust spacing here
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        AspectRatio(
+                          aspectRatio: 1,
+                          child: PieChart(
+                            dataMap: normalizedDataMap,
+                            animationDuration: Duration(milliseconds: 800),
+                            chartLegendSpacing: 1,
+                            chartRadius: MediaQuery.of(context).size.width / 2,
+                            colorList: colorList,
+                            initialAngleInDegree: 0,
+                            chartType: ChartType.ring,
+                            ringStrokeWidth: 60,
+                            chartValuesOptions: ChartValuesOptions(
+                              showChartValues: false,
+                              showChartValuesInPercentage: true,
+                              showChartValueBackground: true,
+                              showChartValuesOutside: true,
+                              decimalPlaces: 0,
+                              chartValueStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: GoogleFonts.poppins().fontFamily,
+                              ),
+                            ),
+                            legendOptions: LegendOptions(
+                              showLegends: false,
+                              legendPosition: LegendPosition.bottom,
+                              legendShape: BoxShape.circle,
+                              legendTextStyle: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 12,
+                                fontFamily: GoogleFonts.poppins().fontFamily,
+                              ),
+                            ),
                           ),
                         ),
-                        legendOptions: LegendOptions(
-                          showLegends: false,
-                          legendPosition: LegendPosition.bottom,
-                          legendShape: BoxShape.circle,
-                          legendTextStyle: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            fontFamily: GoogleFonts.poppins().fontFamily,
+                        Text(
+                          'Total: ${sum.toStringAsFixed(0)}',
+                          style: TextStyle(
+                            fontSize: 36,
+                            fontFamily: GoogleFonts.singleDay().fontFamily,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.black,
                           ),
                         ),
-                      ),
+                      ],
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -204,7 +218,7 @@ class _StatPageState extends State<StatPage> {
                                     ),
                                     SizedBox(width: 8),
                                     Text(
-                                      '${entry.key}: ${entry.value.toStringAsFixed(1)}%',
+                                      '${entry.key}: ${entry.value.toStringAsFixed(0)}%', // Set decimalPlaces to 0
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
