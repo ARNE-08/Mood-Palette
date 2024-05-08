@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pie_chart/pie_chart.dart';
+import 'package:mood_palette/widget/navbar.dart';
 
 class StatPage extends StatefulWidget {
   const StatPage({Key? key}) : super(key: key);
@@ -66,228 +67,243 @@ class _StatPageState extends State<StatPage> {
 
     return Scaffold(
       backgroundColor: const Color.fromRGBO(255, 254, 234, 1),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 80),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
               children: [
-                Text(
-                  'MoodPalette',
-                  style: GoogleFonts.singleDay(
-                    textStyle: const TextStyle(
-                      fontSize: 36,
+                const SizedBox(height: 40),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'MoodPalette',
+                      style: GoogleFonts.singleDay(
+                        textStyle: const TextStyle(
+                          fontSize: 36,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Icon(Icons.calendar_today),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 0), // Adjust padding here
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      blurRadius: 7,
-                      spreadRadius: 0,
-                      offset: const Offset(0, 10),
-                    ),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.calendar_today),
                   ],
                 ),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 40),
-                    Container(
-                      width: 215,
-                      height: 35,
-                      decoration: BoxDecoration(
-                        color: const Color.fromRGBO(91, 188, 255, 1),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 1, vertical: 1),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                currentMonthIndex =
-                                    (currentMonthIndex - 1) % months.length;
-                              });
-                            },
-                            icon: const Icon(Icons.arrow_back_ios),
-                            color: Colors.white,
-                            iconSize: 16,
-                          ),
-                          Text(
-                            months[currentMonthIndex],
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontFamily: GoogleFonts.singleDay().fontFamily,
-                              fontWeight: FontWeight.normal,
-                              color: Colors.white,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                currentMonthIndex =
-                                    (currentMonthIndex + 1) % months.length;
-                              });
-                            },
-                            icon: const Icon(Icons.arrow_forward_ios),
-                            color: Colors.white,
-                            iconSize: 16,
-                          ),
-                        ],
-                      ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          blurRadius: 7,
+                          spreadRadius: 0,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 20), // Adjust spacing here
-                    Stack(
-                      alignment: Alignment.center,
+                    child: Column(
                       children: [
-                        AspectRatio(
-                          aspectRatio: 1,
-                          child: PieChart(
-                            dataMap: Map.fromEntries(sortedEntries),
-                            animationDuration:
-                                const Duration(milliseconds: 800),
-                            chartLegendSpacing: 1,
-                            chartRadius: MediaQuery.of(context).size.width / 2,
-                            colorList: colorList,
-                            initialAngleInDegree: 0,
-                            chartType: ChartType.ring,
-                            ringStrokeWidth: 60,
-                            chartValuesOptions: ChartValuesOptions(
-                              showChartValues: false,
-                              showChartValuesInPercentage: true,
-                              showChartValueBackground: true,
-                              showChartValuesOutside: true,
-                              decimalPlaces: 0,
-                              chartValueStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
+                        const SizedBox(height: 40),
+                        Container(
+                          width: 215,
+                          height: 35,
+                          decoration: BoxDecoration(
+                            color: const Color.fromRGBO(91, 188, 255, 1),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 1, vertical: 1),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    currentMonthIndex =
+                                        (currentMonthIndex - 1) % months.length;
+                                  });
+                                },
+                                icon: const Icon(Icons.arrow_back_ios),
+                                color: Colors.white,
+                                iconSize: 16,
+                              ),
+                              Text(
+                                months[currentMonthIndex],
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontFamily:
+                                      GoogleFonts.singleDay().fontFamily,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    currentMonthIndex =
+                                        (currentMonthIndex + 1) % months.length;
+                                  });
+                                },
+                                icon: const Icon(Icons.arrow_forward_ios),
+                                color: Colors.white,
+                                iconSize: 16,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            AspectRatio(
+                              aspectRatio: 1,
+                              child: PieChart(
+                                dataMap: Map.fromEntries(sortedEntries),
+                                animationDuration:
+                                    const Duration(milliseconds: 800),
+                                chartLegendSpacing: 1,
+                                chartRadius: MediaQuery.of(context).size.width /
+                                    2,
+                                colorList: colorList,
+                                initialAngleInDegree: 0,
+                                chartType: ChartType.ring,
+                                ringStrokeWidth: 60,
+                                chartValuesOptions: ChartValuesOptions(
+                                  showChartValues: false,
+                                  showChartValuesInPercentage: true,
+                                  showChartValueBackground: true,
+                                  showChartValuesOutside: true,
+                                  decimalPlaces: 0,
+                                  chartValueStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily:
+                                        GoogleFonts.poppins().fontFamily,
+                                  ),
+                                ),
+                                legendOptions: LegendOptions(
+                                  showLegends: false,
+                                  legendPosition: LegendPosition.bottom,
+                                  legendShape: BoxShape.circle,
+                                  legendTextStyle: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 12,
+                                    fontFamily:
+                                        GoogleFonts.poppins().fontFamily,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Text(
+                              '${sum.toStringAsFixed(0)}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 36,
+                                fontFamily:
+                                    GoogleFonts.singleDay().fontFamily,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: GoogleFonts.poppins().fontFamily,
+                                color: Colors.black,
                               ),
                             ),
-                            legendOptions: LegendOptions(
-                              showLegends: false,
-                              legendPosition: LegendPosition.bottom,
-                              legendShape: BoxShape.circle,
-                              legendTextStyle: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 12,
+                            Text(
+                              '\n \n total count',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
                                 fontFamily: GoogleFonts.poppins().fontFamily,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.black,
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                        
-                        Text(
-                          '${sum.toStringAsFixed(0)}',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 36, // Adjust the font size as needed
-                            fontFamily: GoogleFonts.singleDay().fontFamily,
-                            fontWeight: FontWeight
-                                .bold, // Adjust the font weight as needed
-                            color: Colors.black,
-                          ),
-                        ),
-                        // Adjust spacing between the number and the text
-                        Text(
-                          '\n \n total count',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 20, // Adjust the font size as needed
-                            fontFamily: GoogleFonts.poppins().fontFamily,
-                            fontWeight: FontWeight
-                                .normal, // Adjust the font weight as needed
-                            color: Colors.black,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: sortedEntries
+                                .map(
+                                  (entry) => Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 5.0),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 20,
+                                          height: 20,
+                                          color: colorList[sortedEntries
+                                              .map((e) => e.key)
+                                              .toList()
+                                              .indexOf(entry.key)],
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                entry.key,
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              LinearProgressIndicator(
+                                                value: entry.value /
+                                                    100, 
+                                                backgroundColor:
+                                                    Colors.grey[300],
+                                                valueColor:
+                                                    AlwaysStoppedAnimation<
+                                                        Color>(
+                                                  colorList[sortedEntries
+                                                      .map((e) => e.key)
+                                                      .toList()
+                                                      .indexOf(entry.key)],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Text(
+                                          '${dataMap[entry.key]?.toInt() ?? 0} / ${entry.value.toInt()}%',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 50),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                           ),
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: sortedEntries
-                            .map(
-                              (entry) => Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 5.0),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 20,
-                                      height: 20,
-                                      color: colorList[sortedEntries
-                                          .map((e) => e.key)
-                                          .toList()
-                                          .indexOf(entry.key)],
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            entry.key,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          LinearProgressIndicator(
-                                            value: entry.value /
-                                                100, // assuming entry.value represents the percentage
-                                            backgroundColor: Colors.grey[300],
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                              colorList[sortedEntries
-                                                  .map((e) => e.key)
-                                                  .toList()
-                                                  .indexOf(entry.key)],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Text(
-                                      '${dataMap[entry.key]?.toInt() ?? 0} / ${entry.value.toInt()}%',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 50),
-                                  ],
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+          const SizedBox(height: 100),
+
+              ],
             ),
-          ],
-        ),
+          ),
+          const Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: NavBar(), 
+          ),
+        ],
       ),
     );
   }

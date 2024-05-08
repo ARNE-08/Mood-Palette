@@ -24,7 +24,7 @@ class NavBar extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(context, '/statistic');
+                  Navigator.pushNamed(context, '/stat');
                 },
                 child: Column(
                   children: [
