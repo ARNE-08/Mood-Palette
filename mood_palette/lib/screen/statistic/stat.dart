@@ -113,7 +113,8 @@ class _StatPageState extends State<StatPage> {
                         color: const Color.fromRGBO(91, 188, 255, 1),
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 1, vertical: 1),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -159,7 +160,8 @@ class _StatPageState extends State<StatPage> {
                           aspectRatio: 1,
                           child: PieChart(
                             dataMap: Map.fromEntries(sortedEntries),
-                            animationDuration: const Duration(milliseconds: 800),
+                            animationDuration:
+                                const Duration(milliseconds: 800),
                             chartLegendSpacing: 1,
                             chartRadius: MediaQuery.of(context).size.width / 2,
                             colorList: colorList,
@@ -222,8 +224,36 @@ class _StatPageState extends State<StatPage> {
                                           .indexOf(entry.key)],
                                     ),
                                     const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            entry.key,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          LinearProgressIndicator(
+                                            value: entry.value /
+                                                100, // assuming entry.value represents the percentage
+                                            backgroundColor: Colors.grey[300],
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                              colorList[sortedEntries
+                                                  .map((e) => e.key)
+                                                  .toList()
+                                                  .indexOf(entry.key)],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                     Text(
-                                      '${entry.key}: ${dataMap[entry.key]?.toInt() ?? 0} / ${entry.value.toInt()}%',
+                                      '${dataMap[entry.key]?.toInt() ?? 0} / ${entry.value.toInt()}%',
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
