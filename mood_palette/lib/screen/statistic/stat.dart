@@ -61,27 +61,27 @@ class _StatPageState extends State<StatPage> {
     ];
 
     return Scaffold(
-      backgroundColor: Color.fromRGBO(255, 254, 234, 1),
+      backgroundColor: const Color.fromRGBO(255, 254, 234, 1),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(height: 90),
+             const SizedBox(height: 90),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'MoodPalette',
                   style: GoogleFonts.singleDay(
-                    textStyle: TextStyle(
+                    textStyle: const TextStyle(
                       fontSize: 36,
                     ),
                   ),
                 ),
-                SizedBox(width: 8),
-                Icon(Icons.calendar_today),
+                const SizedBox(width: 8),
+                const Icon(Icons.calendar_today),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -92,11 +92,11 @@ class _StatPageState extends State<StatPage> {
                           (currentMonthIndex - 1) % months.length;
                     });
                   },
-                  icon: Icon(Icons.arrow_back_ios),
+                  icon: const Icon(Icons.arrow_back_ios),
                 ),
                 Text(
                   months[currentMonthIndex],
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 IconButton(
                   onPressed: () {
@@ -105,15 +105,15 @@ class _StatPageState extends State<StatPage> {
                           (currentMonthIndex + 1) % months.length;
                     });
                   },
-                  icon: Icon(Icons.arrow_forward_ios),
+                  icon: const Icon(Icons.arrow_forward_ios),
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                     horizontal: 20, vertical: 0), // Adjust padding here
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -123,7 +123,7 @@ class _StatPageState extends State<StatPage> {
                       color: Colors.grey.withOpacity(0.5),
                       blurRadius: 7,
                       spreadRadius: 0,
-                      offset: Offset(0, 10),
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
@@ -133,7 +133,7 @@ class _StatPageState extends State<StatPage> {
                       aspectRatio: 0.6,
                       child: PieChart(
                         dataMap: normalizedDataMap,
-                        animationDuration: Duration(milliseconds: 800),
+                        animationDuration: const Duration(milliseconds: 800),
                         chartLegendSpacing: 10,
                         chartRadius: MediaQuery.of(context).size.width / 2,
                         colorList: colorList,
@@ -141,7 +141,7 @@ class _StatPageState extends State<StatPage> {
                         chartType: ChartType.ring,
                         ringStrokeWidth: 70,
                         chartValuesOptions: ChartValuesOptions(
-                          showChartValues: true,
+                          showChartValues: false,
                           showChartValuesInPercentage: true,
                           showChartValueBackground: false,
                           showChartValuesOutside: true,
@@ -183,10 +183,10 @@ class _StatPageState extends State<StatPage> {
                                           .toList()
                                           .indexOf(entry.key)],
                                     ),
-                                    SizedBox(width: 8),
+                                    const SizedBox(width: 8),
                                     Text(
                                       '${entry.key}: ${entry.value.toStringAsFixed(1)}%',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
                                       ),
