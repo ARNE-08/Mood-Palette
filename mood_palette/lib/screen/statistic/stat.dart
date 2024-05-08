@@ -65,31 +65,31 @@ class _StatPageState extends State<StatPage> {
     ];
 
     return Scaffold(
-      backgroundColor: Color.fromRGBO(255, 254, 234, 1),
+      backgroundColor: const Color.fromRGBO(255, 254, 234, 1),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(height: 80),
+            const SizedBox(height: 80),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'MoodPalette',
                   style: GoogleFonts.singleDay(
-                    textStyle: TextStyle(
+                    textStyle: const TextStyle(
                       fontSize: 36,
                     ),
                   ),
                 ),
-                SizedBox(width: 8),
-                Icon(Icons.calendar_today),
+                const SizedBox(width: 8),
+                const Icon(Icons.calendar_today),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                     horizontal: 20, vertical: 0), // Adjust padding here
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -99,21 +99,21 @@ class _StatPageState extends State<StatPage> {
                       color: Colors.grey.withOpacity(0.5),
                       blurRadius: 7,
                       spreadRadius: 0,
-                      offset: Offset(0, 10),
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
                 child: Column(
                   children: [
-                    SizedBox(height: 40),
+                    const SizedBox(height: 40),
                     Container(
                       width: 215,
                       height: 35,
                       decoration: BoxDecoration(
-                        color: Color.fromRGBO(91, 188, 255, 1),
+                        color: const Color.fromRGBO(91, 188, 255, 1),
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+                      padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -124,7 +124,7 @@ class _StatPageState extends State<StatPage> {
                                     (currentMonthIndex - 1) % months.length;
                               });
                             },
-                            icon: Icon(Icons.arrow_back_ios),
+                            icon: const Icon(Icons.arrow_back_ios),
                             color: Colors.white,
                             iconSize: 16,
                           ),
@@ -144,14 +144,14 @@ class _StatPageState extends State<StatPage> {
                                     (currentMonthIndex + 1) % months.length;
                               });
                             },
-                            icon: Icon(Icons.arrow_forward_ios),
+                            icon: const Icon(Icons.arrow_forward_ios),
                             color: Colors.white,
                             iconSize: 16,
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 20), // Adjust spacing here
+                    const SizedBox(height: 20), // Adjust spacing here
                     Stack(
                       alignment: Alignment.center,
                       children: [
@@ -159,7 +159,7 @@ class _StatPageState extends State<StatPage> {
                           aspectRatio: 1,
                           child: PieChart(
                             dataMap: Map.fromEntries(sortedEntries),
-                            animationDuration: Duration(milliseconds: 800),
+                            animationDuration: const Duration(milliseconds: 800),
                             chartLegendSpacing: 1,
                             chartRadius: MediaQuery.of(context).size.width / 2,
                             colorList: colorList,
@@ -221,15 +221,15 @@ class _StatPageState extends State<StatPage> {
                                           .toList()
                                           .indexOf(entry.key)],
                                     ),
-                                    SizedBox(width: 8),
+                                    const SizedBox(width: 8),
                                     Text(
                                       '${entry.key}: ${dataMap[entry.key]?.toInt() ?? 0} / ${entry.value.toInt()}%',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                    SizedBox(height: 50),
+                                    const SizedBox(height: 50),
                                   ],
                                 ),
                               ),
