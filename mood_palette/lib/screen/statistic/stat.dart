@@ -2,8 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pie_chart/pie_chart.dart';
 
-class StatPage extends StatelessWidget {
+class StatPage extends StatefulWidget {
   const StatPage({Key? key}) : super(key: key);
+
+  @override
+  _StatPageState createState() => _StatPageState();
+}
+
+class _StatPageState extends State<StatPage> {
+  int currentMonthIndex = 0;
+  final List<String> months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -63,74 +84,96 @@ class StatPage extends StatelessWidget {
         ),
       ),
       body: Container(
-        color: Color.fromRGBO(255, 254, 234, 1),
+        color: Color.fromRGBO(255, 254, 234, 1), // Set background color here
         width: double.infinity,
         height: double.infinity,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        blurRadius: 7,
-                        spreadRadius: 0,
-                        offset: Offset(0, 10), // Bottom shadow
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(30),
-                    child: AspectRatio(
-                      aspectRatio: 0.6,
-                      child: PieChart(
-                        dataMap: normalizedDataMap,
-                        animationDuration: Duration(milliseconds: 800),
-                        chartLegendSpacing: 50,
-                        chartRadius: MediaQuery.of(context).size.width / 2,
-                        colorList: colorList,
-                        initialAngleInDegree: 0,
-                        chartType: ChartType.ring,
-                        ringStrokeWidth: 70,
-                        chartValuesOptions: ChartValuesOptions(
-                          showChartValues: true,
-                          showChartValuesInPercentage: true,
-                          showChartValueBackground: false,
-                          showChartValuesOutside: true,
-                          decimalPlaces: 0,
-                          chartValueStyle: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: GoogleFonts.poppins().fontFamily,
-                          ),
+        child: Column(
+          children: [
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      currentMonthIndex = (currentMonthIndex - 1) % months.length;
+                    });
+                  },
+                  icon: Icon(Icons.arrow_back_ios),
+                ),
+                Text(
+                  months[currentMonthIndex],
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      currentMonthIndex = (currentMonthIndex + 1) % months.length;
+                    });
+                  },
+                  icon: Icon(Icons.arrow_forward_ios),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      blurRadius: 7,
+                      spreadRadius: 0,
+                      offset: Offset(0, 10), // Bottom shadow
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(30),
+                  child: AspectRatio(
+                    aspectRatio: 0.6,
+                    child: PieChart(
+                      dataMap: normalizedDataMap,
+                      animationDuration: Duration(milliseconds: 800),
+                      chartLegendSpacing: 50,
+                      chartRadius: MediaQuery.of(context).size.width / 2,
+                      colorList: colorList,
+                      initialAngleInDegree: 0,
+                      chartType: ChartType.ring,
+                      ringStrokeWidth: 70,
+                      chartValuesOptions: ChartValuesOptions(
+                        showChartValues: true,
+                        showChartValuesInPercentage: true,
+                        showChartValueBackground: false,
+                        showChartValuesOutside: true,
+                        decimalPlaces: 0,
+                        chartValueStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
                         ),
-                        legendOptions: LegendOptions(
-                          showLegends: true,
-                          legendPosition: LegendPosition.bottom,
-                          legendShape: BoxShape.circle,
-                          legendTextStyle: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            fontFamily: GoogleFonts.poppins().fontFamily,
-                          ),
+                      ),
+                      legendOptions: LegendOptions(
+                        showLegends: true,
+                        legendPosition: LegendPosition.bottom,
+                        legendShape: BoxShape.circle,
+                        legendTextStyle: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
+                          fontFamily: GoogleFonts.poppins().fontFamily,
                         ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
