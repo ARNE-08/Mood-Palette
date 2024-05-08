@@ -33,11 +33,11 @@ class _StatPageState extends State<StatPage> {
     "Uncomfortable": 3,
     "Confused": 4,
     "Chill": 5,
-    "Calm": 6,
+    "Calm": 2,
     "Embarrassed": 7,
-    "Bored": 8,
-    "Sad": 11,
-    "Worried": 10,
+    "Bored": 3,
+    "Sad": 1,
+    "Worried": 1,
   };
 
   @override
@@ -61,59 +61,31 @@ class _StatPageState extends State<StatPage> {
     ];
 
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(255, 254, 234, 1),
+      backgroundColor: Color.fromRGBO(255, 254, 234, 1),
       body: SingleChildScrollView(
         child: Column(
           children: [
-             const SizedBox(height: 90),
+            SizedBox(height: 80),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'MoodPalette',
                   style: GoogleFonts.singleDay(
-                    textStyle: const TextStyle(
+                    textStyle: TextStyle(
                       fontSize: 36,
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                const Icon(Icons.calendar_today),
+                SizedBox(width: 8),
+                Icon(Icons.calendar_today),
               ],
             ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      currentMonthIndex =
-                          (currentMonthIndex - 1) % months.length;
-                    });
-                  },
-                  icon: const Icon(Icons.arrow_back_ios),
-                ),
-                Text(
-                  months[currentMonthIndex],
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      currentMonthIndex =
-                          (currentMonthIndex + 1) % months.length;
-                    });
-                  },
-                  icon: const Icon(Icons.arrow_forward_ios),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
-                padding: const EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                     horizontal: 20, vertical: 0), // Adjust padding here
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -123,17 +95,64 @@ class _StatPageState extends State<StatPage> {
                       color: Colors.grey.withOpacity(0.5),
                       blurRadius: 7,
                       spreadRadius: 0,
-                      offset: const Offset(0, 10),
+                      offset: Offset(0, 10),
                     ),
                   ],
                 ),
                 child: Column(
                   children: [
+                    SizedBox(height: 40),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Color.fromRGBO(91, 188, 255, 1),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                currentMonthIndex =
+                                    (currentMonthIndex - 1) % months.length;
+                              });
+                            },
+                            icon: Icon(Icons.arrow_back_ios),
+                            color: Colors.white,
+                            iconSize: 16,
+                          ),
+                          Text(
+                            months[currentMonthIndex],
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontFamily: GoogleFonts.singleDay().fontFamily,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.white,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                currentMonthIndex =
+                                    (currentMonthIndex + 1) % months.length;
+                              });
+                            },
+                            icon: Icon(Icons.arrow_forward_ios),
+                            color: Colors.white,
+                            iconSize: 16,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Adjust spacing here
                     AspectRatio(
-                      aspectRatio: 0.6,
+                      aspectRatio: 1,
                       child: PieChart(
                         dataMap: normalizedDataMap,
-                        animationDuration: const Duration(milliseconds: 800),
+                        animationDuration: Duration(milliseconds: 800),
                         chartLegendSpacing: 10,
                         chartRadius: MediaQuery.of(context).size.width / 2,
                         colorList: colorList,
@@ -173,7 +192,7 @@ class _StatPageState extends State<StatPage> {
                             .map(
                               (entry) => Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 4.0),
+                                    const EdgeInsets.symmetric(vertical: 5.0),
                                 child: Row(
                                   children: [
                                     Container(
@@ -183,14 +202,15 @@ class _StatPageState extends State<StatPage> {
                                           .toList()
                                           .indexOf(entry.key)],
                                     ),
-                                    const SizedBox(width: 8),
+                                    SizedBox(width: 8),
                                     Text(
                                       '${entry.key}: ${entry.value.toStringAsFixed(1)}%',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
+                                    SizedBox(height: 50),
                                   ],
                                 ),
                               ),
