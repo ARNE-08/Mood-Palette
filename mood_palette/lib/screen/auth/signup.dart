@@ -35,15 +35,18 @@ class SignupPage extends StatelessWidget {
 
     if (response.statusCode == 200) {
       // Signup successful
+      _showSnackBar(context, 'Account create successfully. Please login.');
       // Navigate to login page
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
-      );
+      Navigator.pushNamed(context, '/login');
     } else {
-      // Signup failed
-      // Show error message
-      _showSnackBar(context, 'Signup failed. Please try again.');
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        if (responseData.containsKey('error') && responseData['error'] == 'Account is already exists') {
+          // Show Snackbar for account already exists error
+          _showSnackBar(context, 'Account already exists.');
+        } else {
+          // Show generic error message
+          _showSnackBar(context, 'Signup failed. Please try again.');
+        }
     }
   }
 
@@ -170,10 +173,7 @@ class SignupPage extends StatelessWidget {
                           SizedBox(height: 20),
                           GestureDetector(
                             onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => LoginPage()),
-                                );
+                                Navigator.pushNamed(context, '/login');
                             },
                             child: Text(
                               'Already have an account?',
