@@ -193,12 +193,27 @@ class _StatPageState extends State<StatPage> {
                             ),
                           ),
                         ),
+                        
                         Text(
-                          'Total: ${sum.toStringAsFixed(0)}',
+                          '${sum.toStringAsFixed(0)}',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 36,
+                            fontSize: 36, // Adjust the font size as needed
                             fontFamily: GoogleFonts.singleDay().fontFamily,
-                            fontWeight: FontWeight.normal,
+                            fontWeight: FontWeight
+                                .bold, // Adjust the font weight as needed
+                            color: Colors.black,
+                          ),
+                        ),
+                        // Adjust spacing between the number and the text
+                        Text(
+                          '\n \n total count',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 20, // Adjust the font size as needed
+                            fontFamily: GoogleFonts.poppins().fontFamily,
+                            fontWeight: FontWeight
+                                .normal, // Adjust the font weight as needed
                             color: Colors.black,
                           ),
                         ),
