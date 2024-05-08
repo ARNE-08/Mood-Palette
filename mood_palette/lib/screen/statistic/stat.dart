@@ -46,6 +46,10 @@ class _StatPageState extends State<StatPage> {
     final normalizedDataMap =
         dataMap.map((key, value) => MapEntry(key, (value / sum) * 100));
 
+    // Sort the normalizedDataMap entries by value in descending order
+    var sortedEntries = normalizedDataMap.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
     final List<Color> colorList = [
       const Color.fromRGBO(255, 0, 34, 1),
       const Color.fromRGBO(254, 105, 0, 1),
@@ -127,7 +131,7 @@ class _StatPageState extends State<StatPage> {
                           Text(
                             months[currentMonthIndex],
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 24,
                               fontFamily: GoogleFonts.singleDay().fontFamily,
                               fontWeight: FontWeight.normal,
                               color: Colors.white,
@@ -154,7 +158,7 @@ class _StatPageState extends State<StatPage> {
                         AspectRatio(
                           aspectRatio: 1,
                           child: PieChart(
-                            dataMap: normalizedDataMap,
+                            dataMap: Map.fromEntries(sortedEntries),
                             animationDuration: Duration(milliseconds: 800),
                             chartLegendSpacing: 1,
                             chartRadius: MediaQuery.of(context).size.width / 2,
@@ -202,7 +206,7 @@ class _StatPageState extends State<StatPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 30),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: normalizedDataMap.entries
+                        children: sortedEntries
                             .map(
                               (entry) => Padding(
                                 padding:
@@ -212,13 +216,14 @@ class _StatPageState extends State<StatPage> {
                                     Container(
                                       width: 20,
                                       height: 20,
-                                      color: colorList[normalizedDataMap.keys
+                                      color: colorList[sortedEntries
+                                          .map((e) => e.key)
                                           .toList()
                                           .indexOf(entry.key)],
                                     ),
                                     SizedBox(width: 8),
                                     Text(
-                                      '${entry.key}: ${entry.value.toStringAsFixed(0)}%', // Set decimalPlaces to 0
+                                      '${entry.key}: ${dataMap[entry.key]?.toInt() ?? 0} / ${entry.value.toInt()}%',
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
