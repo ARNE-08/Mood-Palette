@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mood_palette/widget/loginbutton.dart';
 import 'package:mood_palette/screen/auth/signup.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:cookie_jar/cookie_jar.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -17,9 +20,9 @@ class LoginPage extends StatelessWidget {
       final String password = _passwordController.text;
 
       void _showSnackBar(BuildContext context, String message) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message),
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
           ),
         );
       }
@@ -35,33 +38,48 @@ class LoginPage extends StatelessWidget {
         return;
       }
 
-      // Make HTTP POST request to signup endpoint
-        // Make HTTP POST request to signup endpoint
+      // Make HTTP POST request to login endpoint
       final url = Uri.parse('http://localhost:3000/login');
       final response = await http.post(
         url,
         body: jsonEncode({'username': username, 'password': password}),
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json'},  
       );
-      print("----> ${response.body}");
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      print('Response headers: ${response.headers.length}');
+      // Extract cookies from response
+      final cookiesString = response.headers['set-cookie'];
+      if (cookiesString != null && cookiesString.isNotEmpty) {
+        // Parse the string containing cookies into a list of Cookie objects
+        final List<Cookie> cookies = [Cookie.fromSetCookieValue(cookiesString)];
+        
+        // Save cookies for future requests
+        final cookieJar = CookieJar();
+        final uri = Uri.parse('http://localhost:3000'); // Adjust this URL according to your backend URL
+        cookieJar.saveFromResponse(uri, cookies);
+      }
+      // print(cookiesString?.isEmpty);
 
       if (response.statusCode == 200) {
-        // Signup successful
+        // Login successful
         _showSnackBar(context, 'Login successful. Redirecting to home page.');
-        // Navigate to login page
+        // Navigate to home page
         Navigator.pushNamed(context, '/');
       } else {
         final Map<String, dynamic> responseData = json.decode(response.body);
-        if (responseData.containsKey('message') && responseData['message'] == 'Error comparing passwords') {
-            // Show Snackbar for incorrect password
-            _showSnackBar(context, 'Incorrect password. Please try again.');
-        } else if (responseData.containsKey('message') && responseData['message'] == 'user not found in the system') {
-            // Show Snackbar for incorrect password
-            _showSnackBar(context, 'This account does not exist. Please sign up.');
-        }
-        else {
-            // Show generic error message
-            _showSnackBar(context, 'Login failed. Please try again.');
+        if (responseData.containsKey('message') &&
+            responseData['message'] == 'Error comparing passwords') {
+          // Show Snackbar for incorrect password
+          _showSnackBar(context, 'Incorrect password. Please try again.');
+        } else if (responseData.containsKey('message') &&
+            responseData['message'] == 'user not found in the system') {
+          // Show Snackbar for user not found
+          _showSnackBar(context, 'This account does not exist. Please sign up.');
+        } else {
+          // Show generic error message
+          _showSnackBar(context, 'Login failed. Please try again.');
         }
       }
     }
