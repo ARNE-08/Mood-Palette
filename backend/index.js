@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const port = 3000;
 
+app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json({ type: "application/json" }));
 app.use(cookieParser());
@@ -30,16 +31,7 @@ const connection = mysql.createConnection({
 
 connection.connect();
 global.connection = connection;
-console.log("Database is connected");
-
-app.use(
-  cors({
-      origin: [process.env.CORS_ORIGIN],
-      credentials: true,
-  })
-);
-
-app.use(express.json());
+console.log("Database is connected");;
 
 app.get("/", (req, res) => {
   res.send("Hello MoodPalette!");
