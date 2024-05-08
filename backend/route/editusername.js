@@ -1,10 +1,9 @@
 const mysql = require("mysql");
-const bcrypt = require("bcrypt");
 
 module.exports = async (req, res) => {
-    const { username, password } = req.body;
-    const salt1 = await bcrypt.genSalt(10);
-    const hash1 = await bcrypt.hash(password, salt1);
+    // ! how will we sent the user_id ? can we decode it from the cookie and send as body ?
+    const { username } = req.body;
+    const { user_id } = parseInt(req.body.user_id);
 
     // Check if username already exists
     var checkUsernameQuery = mysql.format("SELECT * FROM user WHERE username = ?", [username]);
@@ -17,22 +16,21 @@ module.exports = async (req, res) => {
             });
         }
 
-        if (rows.length > 0) {
+        if (rows.length > 1) {
             // Username already exists
             return res.status(400).json({
                 success: false,
                 data: null,
-                error: "Account is already exists",
+                error: "Username is already exists",
             });
         }
 
         // Username does not exist, proceed with registration
-        var insertQuery = mysql.format(
-            "INSERT INTO user (username, hashed_password) VALUES (?, ?)",
-            [username, hash1]
+        var updateQuery = mysql.format(
+            "UPDATE user SET username = ? WHERE user_id = ?", [username, user_id]
         );
 
-        connection.query(insertQuery, (err, rows) => {
+        connection.query(updateQuery, (err, rows) => {
             if (err) {
                 return res.status(400).json({
                     success: false,
@@ -43,7 +41,7 @@ module.exports = async (req, res) => {
 
             res.status(200).json({
                 success: true,
-                message: "User has been created",
+                message: "Username changed successfully",
             });
         });
     });
