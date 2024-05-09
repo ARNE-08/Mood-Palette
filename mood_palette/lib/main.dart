@@ -8,7 +8,6 @@ import 'package:mood_palette/screen/statistic/stat.dart';
 
 void main() {
   runApp(MyApp());
-  WidgetsFlutterBinding.ensureInitialized();
 }
 
 class MyApp extends StatelessWidget {
@@ -21,15 +20,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Mood Palette',
       // Determine the initial route based on the presence of the userToken cookie
-      //initialRoute: isLoggedIn ? '/' : '/login',
-      initialRoute: isLoggedIn ? '/stat' : '/stat',
+      initialRoute: isLoggedIn ? '/' : '/login',
       // Define route paths and corresponding widgets
       routes: {
         '/': (context) => HomePage(), // Default route when logged in
         '/login': (context) => LoginPage(), // Route for login page
-        '/signup': (context) => SignupPage(), // Route for signup page
-        '/profile': (context) => ProfilePage(), // Route for profile page
-        '/stat': (context) => StatPage(), // Route for stat page
+        '/signup':(context) => SignupPage(), // Route for signup page
+        '/profile':(context) => ProfilePage(), // Route for profile page
+        '/stat':(context) => StatPage(), // Route for statistic page
       },
     );
   }
