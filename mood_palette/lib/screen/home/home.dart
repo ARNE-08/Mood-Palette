@@ -16,7 +16,7 @@ class _HomePageState extends State<HomePage> {
   PageController _pageController =
       PageController(initialPage: DateTime.now().month - 1);
 
-  DateTime _currentMonth = DateTime.now();
+  DateTime _currentMonth = DateTime.now().subtract(const Duration(days: 1));
   bool selectedcurrentyear = false;
   @override
   void initState() {
@@ -277,10 +277,11 @@ class _HomePageState extends State<HomePage> {
           // Displaying the current month's days
           DateTime date =
               DateTime(month.year, month.month, index - weekdayOfFirstDay + 2);
-          Color dayColor = date.isBefore(DateTime.now())
+          // ! set to generate color to the day before today
+          Color dayColor = date.isBefore(DateTime.now().subtract(Duration(days: 1)))
               ? randomColors[Random().nextInt(randomColors.length)]
-              : const Color.fromRGBO(
-                  217, 217, 217, 1); // Check if the date is before today
+              : const Color.fromRGBO(217, 217, 217, 1); // Check if the date is before yesterday
+ // Check if the date is before today
           String text = date.day.toString();
 
           return InkWell(
