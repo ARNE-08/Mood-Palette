@@ -41,7 +41,6 @@ dependencies:
   google_fonts: ^6.2.1
   http: ^1.2.1
   shared_preferences: ^2.2.3
-  pie_chart: ^5.4.0
 
 dev_dependencies:
   flutter_test:
