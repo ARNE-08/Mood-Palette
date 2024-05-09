@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:mood_palette/widget/navbar.dart';
+import 'dart:math';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,10 +26,10 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(255, 254, 234, 1),
+      backgroundColor: const Color.fromRGBO(255, 254, 234, 1),
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Color.fromRGBO(
+        backgroundColor: const Color.fromRGBO(
             255, 254, 234, 1), // Set background color to match the container
         elevation: 0, // Remove the elevation
         title: Padding(
@@ -39,13 +41,13 @@ class _HomePageState extends State<HomePage> {
               Text(
                 'MoodPalette',
                 style: GoogleFonts.singleDay(
-                  textStyle: TextStyle(
+                  textStyle: const TextStyle(
                     fontSize: 36,
                   ),
                 ),
               ),
-              SizedBox(width: 8),
-              Icon(Icons.calendar_today), // Calendar icon
+              const SizedBox(width: 8),
+              const Icon(Icons.calendar_today), // Calendar icon
             ],
           ),
         ),
@@ -70,6 +72,7 @@ class _HomePageState extends State<HomePage> {
               },
             ),
           ),
+          const NavBar(),
         ],
       ),
     );
@@ -81,100 +84,118 @@ class _HomePageState extends State<HomePage> {
     // Checks if the current month is the last month of the year (December)
     bool isLastMonthOfYear = _currentMonth.month == 12;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              // Moves to the previous page if the current page index is greater than 0
-              if (_pageController.page! > 0) {
-                _pageController.previousPage(
-                  duration: Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                );
-              }
-            },
+    return Column(
+      children: [
+        const SizedBox(height: 30),
+        Container(
+          width: 215,
+          height: 35,
+          decoration: BoxDecoration(
+            color: const Color.fromRGBO(91, 188, 255, 1),
+            borderRadius: BorderRadius.circular(30),
           ),
-          // Displays the name of the current month
-          // Text(
-          //   '${DateFormat('MMMM').format(_currentMonth)}',
-          //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          // ),
-          DropdownButton<String>(
-            // Dropdown for selecting a month
-            iconSize: 0.0,
-            value: DateFormat('MMMM').format(_currentMonth),
-            onChanged: (String? selectedMonth) {
-              if (selectedMonth != null) {
-                setState(() {
-                  // Updates the current month based on the selected month
-                  _currentMonth = DateTime.parse(
-                      '${DateTime.now().year}-$selectedMonth-01');
+          padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios),
+                color: Colors.white,
+                iconSize: 12,
+                onPressed: () {
+                  // Moves to the previous page if the current page index is greater than 0
+                  if (_pageController.page! > 0) {
+                    _pageController.previousPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  }
+                },
+              ),
+              DropdownButton<String>(
+                // Dropdown for selecting a month
+                underline: const SizedBox(),
+                dropdownColor: Colors.grey[700],
+                iconSize: 0.0,
+                style: const TextStyle(color: Colors.white),
+                value: DateFormat('MMMM').format(_currentMonth),
+                onChanged: (String? selectedMonth) {
+                  if (selectedMonth != null) {
+                    setState(() {
+                      // Updates the current month based on the selected month
+                      _currentMonth = DateTime.parse(
+                          '${DateTime.now().year}-$selectedMonth-01');
 
-                  // Calculates the month index based on the selected month and sets the page
-                  int monthIndex = _currentMonth.month - 1;
-                  _pageController.jumpToPage(monthIndex);
-                });
-              }
-            },
-            items: [
-              // Generates DropdownMenuItems for each month
-              for (int month = 1; month <= 12; month++)
-                DropdownMenuItem<String>(
-                  value: DateFormat('MMMM')
-                      .format(DateTime(DateTime.now().year, month, 1)),
-                  child: Text(DateFormat('MMMM')
-                      .format(DateTime(DateTime.now().year, month, 1))),
-                ),
+                      // Calculates the month index based on the selected month and sets the page
+                      int monthIndex = _currentMonth.month - 1;
+                      _pageController.jumpToPage(monthIndex);
+                    });
+                  }
+                },
+                items: [
+                  // Generates DropdownMenuItems for each month
+                  for (int month = 1; month <= 12; month++)
+                    DropdownMenuItem<String>(
+                      value: DateFormat('MMMM')
+                          .format(DateTime(DateTime.now().year, month, 1)),
+                      child: Text(DateFormat('MMMM')
+                          .format(DateTime(DateTime.now().year, month, 1))),
+                    ),
+                ],
+              ),
+              DropdownButton<int>(
+                // Dropdown for selecting a year
+                underline: const SizedBox(),
+                style: const TextStyle(color: Colors.white),
+                dropdownColor: Colors.grey[700],
+                iconSize: 0.0,
+                value: _currentMonth.year,
+                onChanged: (int? year) {
+                  if (year != null) {
+                    setState(() {
+                      // Sets the current month to January of the selected year
+                      _currentMonth = DateTime(year, 1, 1);
+
+                      // Calculates the month index based on the selected year and sets the page
+                      int yearDiff = DateTime.now().year - year;
+                      int monthIndex = 12 * yearDiff + _currentMonth.month - 1;
+                      _pageController.jumpToPage(monthIndex);
+                    });
+                  }
+                },
+                items: [
+                  // Generates DropdownMenuItems for a range of years from current year to 10 years ahead
+                  for (int year = DateTime.now().year;
+                      year <= DateTime.now().year + 10;
+                      year++)
+                    DropdownMenuItem<int>(
+                      value: year,
+                      child: Text(
+                        year.toString(),
+                      ),
+                    ),
+                ],
+              ),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward_ios),
+                color: Colors.white,
+                iconSize: 12,
+                onPressed: () {
+                  // Moves to the next page if it's not the last month of the year
+                  if (!isLastMonthOfYear) {
+                    setState(() {
+                      _pageController.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    });
+                  }
+                },
+              ),
             ],
           ),
-          DropdownButton<int>(
-            // Dropdown for selecting a year
-            iconSize: 0.0,
-            value: _currentMonth.year,
-            onChanged: (int? year) {
-              if (year != null) {
-                setState(() {
-                  // Sets the current month to January of the selected year
-                  _currentMonth = DateTime(year, 1, 1);
-
-                  // Calculates the month index based on the selected year and sets the page
-                  int yearDiff = DateTime.now().year - year;
-                  int monthIndex = 12 * yearDiff + _currentMonth.month - 1;
-                  _pageController.jumpToPage(monthIndex);
-                });
-              }
-            },
-            items: [
-              // Generates DropdownMenuItems for a range of years from current year to 10 years ahead
-              for (int year = DateTime.now().year;
-                  year <= DateTime.now().year + 10;
-                  year++)
-                DropdownMenuItem<int>(
-                  value: year,
-                  child: Text(year.toString()),
-                ),
-            ],
-          ),
-          IconButton(
-            icon: Icon(Icons.arrow_forward),
-            onPressed: () {
-              // Moves to the next page if it's not the last month of the year
-              if (!isLastMonthOfYear) {
-                setState(() {
-                  _pageController.nextPage(
-                    duration: Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
-                });
-              }
-            },
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -202,7 +223,7 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.only(right: 8.0),
       child: Text(
         day,
-        style: TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -216,11 +237,24 @@ class _HomePageState extends State<HomePage> {
     int weekdayOfFirstDay = firstDayOfMonth.weekday;
 
     DateTime lastDayOfPreviousMonth =
-        firstDayOfMonth.subtract(Duration(days: 1));
+        firstDayOfMonth.subtract(const Duration(days: 1));
     int daysInPreviousMonth = lastDayOfPreviousMonth.day;
+    List<Color> randomColors = [
+      const Color.fromRGBO(225, 0, 34, 1),
+      const Color.fromRGBO(0, 5, 133, 1),
+      const Color.fromRGBO(89, 251, 234, 1),
+      const Color.fromRGBO(129, 58, 173, 1),
+      const Color.fromRGBO(252, 169, 255, 1),
+      const Color.fromRGBO(157, 156, 194, 1),
+      const Color.fromRGBO(0, 148, 122, 1),
+      const Color.fromRGBO(254, 105, 0, 1),
+      const Color.fromRGBO(255, 245, 0, 1),
+      const Color.fromRGBO(0, 153, 218, 1),
+      const Color.fromRGBO(108, 217, 164, 1),
+    ];
 
     return GridView.builder(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 7,
         childAspectRatio: 1,
@@ -232,107 +266,162 @@ class _HomePageState extends State<HomePage> {
           // Displaying dates from the previous month in grey
           int previousMonthDay =
               daysInPreviousMonth - (weekdayOfFirstDay - index) + 2;
-          return Container(
-              padding: const EdgeInsets.all(4.0),
-              decoration: const BoxDecoration(
-                  // border: Border(
-                  //   top: BorderSide.none,
-                  //   left: BorderSide(width: 1.0, color: Colors.grey),
-                  //   right: BorderSide(width: 1.0, color: Colors.grey),
-                  //   bottom: BorderSide(width: 1.0, color: Colors.grey),
-                  // ),
-                  ),
-              alignment: Alignment.center,
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Center(
-                        child: Container(
-                          width: 30, // Adjust the width and height as needed
-                          height: 30,
-                          color: Colors.grey, // Set the background color to red
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 0,
-                      child: Center(
-                        child: Text(
-                          previousMonthDay.toString(),
-                          style: const TextStyle(
-                              fontSize: 10.0, color: Colors.grey),
-                        ),
-                      ),
-                    ),
-                  ]
-                  // child: Text(
-                  //   previousMonthDay.toString(),
-                  //   style: TextStyle(color: Colors.grey),
-                  ) // ),
-              );
+          DateTime date =
+              DateTime(month.year, month.month, index - weekdayOfFirstDay + 2);
+
+          return buildDayContainer(
+              previousMonthDay,
+              const Color.fromRGBO(217, 217, 217, 1),
+              date); // Function to build day container
         } else {
           // Displaying the current month's days
           DateTime date =
               DateTime(month.year, month.month, index - weekdayOfFirstDay + 2);
+          Color dayColor = date.isBefore(DateTime.now())
+              ? randomColors[Random().nextInt(randomColors.length)]
+              : const Color.fromRGBO(
+                  217, 217, 217, 1); // Check if the date is before today
           String text = date.day.toString();
 
           return InkWell(
             onTap: () {
               // Handle tap on a date cell
-              // This is where you can add functionality when a date is tapped
             },
-            child: Padding(
-              padding: const EdgeInsets.all(4.0), // Add padding here
-              child: Container(
-                decoration: const BoxDecoration(
-                    // border: Border(
-                    //   top: BorderSide.none,
-                    //   left: BorderSide(width: 1.0, color: Colors.grey),
-                    //   right: BorderSide(width: 1.0, color: Colors.grey),
-                    //   bottom: BorderSide(width: 1.0, color: Colors.grey),
-                    // ),
-                    ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Center(
-                        child: Container(
-                          width: 30, // Adjust the width and height as needed
-                          height: 30,
-                          color: Colors.red, // Set the background color to red
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 0,
-                      child: Center(
-                        child: Text(
-                          text,
-                          style: const TextStyle(
-                            fontSize: 10.0,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            child: buildDayContainer(
+                text, dayColor, date), // Function to build day container
           );
         }
       },
     );
   }
-}
 
-// extension DateOnlyCompare on DateTime {
-//   bool isSameDate(DateTime other) {
-//     return this.year == other.year &&
-//         this.month == other.month &&
-//         this.day == other.day;
-//   }
-// }
+  Widget buildDayContainer(dynamic content, Color color, DateTime date) {
+    // Check if the date is today
+    bool isToday = date.year == DateTime.now().year &&
+        date.month == DateTime.now().month &&
+        date.day == DateTime.now().day;
+
+    return Padding(
+      padding: const EdgeInsets.all(0.0),
+      child: GestureDetector(
+        onTap: () {
+          if (isToday) {
+            // Handle tap to show bottom sheet
+            showModalBottomSheet(
+              context: context,
+              builder: (context) {
+                // Replace this with your bottom sheet widget
+                return ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(40),
+                    topRight: Radius.circular(40),
+                  ),
+                  child: Container(
+                    color: Color.fromRGBO(255, 209, 227, 1),
+                    height: 500,
+                    width: double.infinity,
+                    child: Column(
+                      children: [
+                        SizedBox(height: 20),
+                        Container(
+                          padding: const EdgeInsets.all(8.0),
+                          width: 305,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'How are you feeling today?',
+                              style: GoogleFonts.poppins(
+                                // Use Google Fonts
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20), // Add space between the header and the blocks
+                        Wrap(
+                          alignment: WrapAlignment.spaceEvenly,
+                          children: [
+                            _buildColorBlock(0xFFFF0022, 'Angry'),
+                            _buildColorBlock(0xFFFE6900, 'Excited'),
+                            _buildColorBlock(0xFFFFF500, 'Happy'),
+                            _buildColorBlock(0xFF9D9CC2, 'Uncomfortable'),
+                            _buildColorBlock(0xFF00947A, 'Confused'),
+                            _buildColorBlock(0xFF6CD9A4, 'Chill'),
+                            _buildColorBlock(0xFF59FBEA, 'Calm'),
+                            _buildColorBlock(0xFFFCA9FF, 'Embarassed'),
+                            _buildColorBlock(0xFF0099DA, 'Bored'),
+                            _buildColorBlock(0xFF000585, 'Sad'),
+                            _buildColorBlock(0xFF813AAD, 'Worried'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          }
+        },
+        child: Column(
+          children: [
+            Expanded(
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(3),
+                  color: color,
+                ),
+                child: Center(
+                  child: isToday ? Icon(Icons.add, color: Colors.white) : null,
+                ),
+              ),
+            ),
+            const SizedBox(
+                height: 2), // Adjust spacing between the box and the text
+            Text(
+              content.toString(),
+              style: TextStyle(
+                fontSize: 10.0,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColorBlock(int colorValue, String text) {
+    Color color = Color(colorValue);
+    return Padding(
+      padding: const EdgeInsets.all(
+          8.0), // Add padding to create space between blocks
+      child: Column(
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius:
+                  BorderRadius.circular(8), // Adjust the radius as needed
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            text,
+            style: GoogleFonts.poppins(
+              // Use Google Fonts
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

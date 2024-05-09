@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pie_chart/pie_chart.dart';
+import 'package:intl/intl.dart'; // Import DateFormat
 import 'package:mood_palette/widget/navbar.dart';
 
 class StatPage extends StatefulWidget {
@@ -11,21 +12,17 @@ class StatPage extends StatefulWidget {
 }
 
 class _StatPageState extends State<StatPage> {
-  int currentMonthIndex = 0;
-  final List<String> months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ];
+  late DateTime _currentMonth; // Add current month variable
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentMonth = DateTime.now(); // Initialize current month
+    _pageController = PageController(
+      initialPage: _currentMonth.month - 1,
+    );
+  }
 
   final Map<String, double> dataMap = {
     "Angry": 3,
@@ -67,33 +64,42 @@ class _StatPageState extends State<StatPage> {
 
     return Scaffold(
       backgroundColor: const Color.fromRGBO(255, 254, 234, 1),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: const Color.fromRGBO(
+            255, 254, 234, 1), // Set background color to match the container
+        elevation: 0, // Remove the elevation
+        title: Padding(
+          padding: const EdgeInsets.only(
+              top: 30), // Adjust top padding to move the text down
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'MoodPalette',
+                style: GoogleFonts.singleDay(
+                  textStyle: const TextStyle(
+                    fontSize: 36,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(Icons.calendar_today), // Calendar icon
+            ],
+          ),
+        ),
+      ),
       body: Stack(
         children: [
           SingleChildScrollView(
             child: Column(
               children: [
                 const SizedBox(height: 40),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'MoodPalette',
-                      style: GoogleFonts.singleDay(
-                        textStyle: const TextStyle(
-                          fontSize: 36,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.calendar_today),
-                  ],
-                ),
-                const SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 0),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
@@ -109,53 +115,7 @@ class _StatPageState extends State<StatPage> {
                     child: Column(
                       children: [
                         const SizedBox(height: 40),
-                        Container(
-                          width: 215,
-                          height: 35,
-                          decoration: BoxDecoration(
-                            color: const Color.fromRGBO(91, 188, 255, 1),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 1, vertical: 1),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    currentMonthIndex =
-                                        (currentMonthIndex - 1) % months.length;
-                                  });
-                                },
-                                icon: const Icon(Icons.arrow_back_ios),
-                                color: Colors.white,
-                                iconSize: 16,
-                              ),
-                              Text(
-                                months[currentMonthIndex],
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontFamily:
-                                      GoogleFonts.singleDay().fontFamily,
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    currentMonthIndex =
-                                        (currentMonthIndex + 1) % months.length;
-                                  });
-                                },
-                                icon: const Icon(Icons.arrow_forward_ios),
-                                color: Colors.white,
-                                iconSize: 16,
-                              ),
-                            ],
-                          ),
-                        ),
+                        _buildHeader(), // Add month selection header
                         const SizedBox(height: 20),
                         Stack(
                           alignment: Alignment.center,
@@ -167,8 +127,8 @@ class _StatPageState extends State<StatPage> {
                                 animationDuration:
                                     const Duration(milliseconds: 800),
                                 chartLegendSpacing: 1,
-                                chartRadius: MediaQuery.of(context).size.width /
-                                    2,
+                                chartRadius:
+                                    MediaQuery.of(context).size.width / 2,
                                 colorList: colorList,
                                 initialAngleInDegree: 0,
                                 chartType: ChartType.ring,
@@ -205,8 +165,7 @@ class _StatPageState extends State<StatPage> {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 36,
-                                fontFamily:
-                                    GoogleFonts.singleDay().fontFamily,
+                                fontFamily: GoogleFonts.singleDay().fontFamily,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
@@ -257,8 +216,7 @@ class _StatPageState extends State<StatPage> {
                                               ),
                                               const SizedBox(height: 4),
                                               LinearProgressIndicator(
-                                                value: entry.value /
-                                                    100, 
+                                                value: entry.value / 100,
                                                 backgroundColor:
                                                     Colors.grey[300],
                                                 valueColor:
@@ -292,8 +250,7 @@ class _StatPageState extends State<StatPage> {
                     ),
                   ),
                 ),
-          const SizedBox(height: 100),
-
+                const SizedBox(height: 100),
               ],
             ),
           ),
@@ -301,10 +258,128 @@ class _StatPageState extends State<StatPage> {
             left: 0,
             right: 0,
             bottom: 0,
-            child: NavBar(), 
+            child: NavBar(),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildHeader() {
+    // Checks if the current month is the last month of the year (December)
+    bool isLastMonthOfYear = _currentMonth.month == 12;
+
+    return Column(
+      children: [
+        Container(
+          width: 215,
+          height: 35,
+          decoration: BoxDecoration(
+            color: const Color.fromRGBO(91, 188, 255, 1),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios),
+                color: Colors.white,
+                iconSize: 12,
+                onPressed: () {
+                  // Moves to the previous page if the current page index is greater than 0
+                  if (_pageController.page! > 0) {
+                    _pageController.previousPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  }
+                },
+              ),
+              DropdownButton<String>(
+                // Dropdown for selecting a month
+                underline: const SizedBox(),
+                dropdownColor: Colors.grey[700],
+                iconSize: 0.0,
+                style: const TextStyle(color: Colors.white),
+                value: DateFormat('MMMM').format(_currentMonth),
+                onChanged: (String? selectedMonth) {
+                  if (selectedMonth != null) {
+                    setState(() {
+                      // Updates the current month based on the selected month
+                      _currentMonth = DateTime.parse(
+                          '${DateTime.now().year}-$selectedMonth-01');
+
+                      // Calculates the month index based on the selected month and sets the page
+                      int monthIndex = _currentMonth.month - 1;
+                      _pageController.jumpToPage(monthIndex);
+                    });
+                  }
+                },
+                items: [
+                  // Generates DropdownMenuItems for each month
+                  for (int month = 1; month <= 12; month++)
+                    DropdownMenuItem<String>(
+                      value: DateFormat('MMMM')
+                          .format(DateTime(DateTime.now().year, month, 1)),
+                      child: Text(DateFormat('MMMM')
+                          .format(DateTime(DateTime.now().year, month, 1))),
+                    ),
+                ],
+              ),
+              DropdownButton<int>(
+                // Dropdown for selecting a year
+                underline: const SizedBox(),
+                style: const TextStyle(color: Colors.white),
+                dropdownColor: Colors.grey[700],
+                iconSize: 0.0,
+                value: _currentMonth.year,
+                onChanged: (int? year) {
+                  if (year != null) {
+                    setState(() {
+                      // Sets the current month to January of the selected year
+                      _currentMonth = DateTime(year, 1, 1);
+
+                      // Calculates the month index based on the selected year and sets the page
+                      int yearDiff = DateTime.now().year - year;
+                      int monthIndex = 12 * yearDiff + _currentMonth.month - 1;
+                      _pageController.jumpToPage(monthIndex);
+                    });
+                  }
+                },
+                items: [
+                  // Generates DropdownMenuItems for a range of years from current year to 10 years ahead
+                  for (int year = DateTime.now().year;
+                      year <= DateTime.now().year + 10;
+                      year++)
+                    DropdownMenuItem<int>(
+                      value: year,
+                      child: Text(
+                        year.toString(),
+                      ),
+                    ),
+                ],
+              ),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward_ios),
+                color: Colors.white,
+                iconSize: 12,
+                onPressed: () {
+                  // Moves to the next page if it's not the last month of the year
+                  if (!isLastMonthOfYear) {
+                    setState(() {
+                      _pageController.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
