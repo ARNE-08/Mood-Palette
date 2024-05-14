@@ -4,9 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mood_palette/widget/loginbutton.dart';
 import 'package:mood_palette/screen/auth/signup.dart';
+import 'package:mood_palette/main.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:cookie_jar/cookie_jar.dart';
+
+class StringModifier {
+  void updateString(String newValue) {
+    GlobalVariables.instance.token = newValue;
+  }
+}
 
 class LoginPage extends StatelessWidget {
   @override
@@ -46,9 +53,11 @@ class LoginPage extends StatelessWidget {
         headers: {'Content-Type': 'application/json'},  
       );
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-      print('Response headers: ${response.headers.length}');
+      final stringModifier = StringModifier();
+      // stringModifier.updateString(${response.body['data']});
+      // print('Response status: ${response.statusCode}');
+      // print('Response body: ${response.body}');
+      // print('Response headers: ${response.headers.length}');
       // Extract cookies from response
       final cookiesString = response.headers['set-cookie'];
       if (cookiesString != null && cookiesString.isNotEmpty) {
@@ -63,8 +72,12 @@ class LoginPage extends StatelessWidget {
       // print(cookiesString?.isEmpty);
 
       if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final String data = responseData['data'];
+        stringModifier.updateString(data);
         // Login successful
         _showSnackBar(context, 'Login successful. Redirecting to home page.');
+        print("token: ${GlobalVariables.instance.token}");
         // Navigate to home page
         Navigator.pushNamed(context, '/');
       } else {
