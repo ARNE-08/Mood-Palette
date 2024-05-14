@@ -10,12 +10,26 @@ void main() {
   runApp(MyApp());
 }
 
+class GlobalVariables {
+  // Private constructor
+  GlobalVariables._privateConstructor();
+
+  // Singleton instance
+  static final GlobalVariables _instance = GlobalVariables._privateConstructor();
+
+  // Getter for the singleton instance
+  static GlobalVariables get instance => _instance;
+
+  // Global variables
+  String token = "";
+}
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Check for the presence of the userToken cookie
-    String? userToken = html.window.document.cookie; // Get the cookies
-    bool isLoggedIn = userToken!.isNotEmpty;
+    bool isLoggedIn = GlobalVariables.instance.token.isNotEmpty;
+    print("when login: ${isLoggedIn}");
 
     return MaterialApp(
       title: 'Mood Palette',
