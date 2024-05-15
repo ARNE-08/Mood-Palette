@@ -2,8 +2,8 @@ const mysql = require("mysql");
 
 module.exports = async (req, res) => {
     // ! how will we sent the user_id ? can we decode it from the cookie and send as body ?
-    const { username } = req.body;
-    const { user_id } = parseInt(req.body.user_id);
+    const { username, user_id } = req.body;
+    var decoded = jwt.verify(user_id, "ZJGX1QL7ri6BGJWj3t");
 
     // Check if username already exists
     var checkUsernameQuery = mysql.format("SELECT * FROM user WHERE username = ?", [username]);
@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
 
         // Username does not exist, proceed with registration
         var updateQuery = mysql.format(
-            "UPDATE user SET username = ? WHERE user_id = ?", [username, user_id]
+            "UPDATE user SET username = ? WHERE user_id = ?", [username, decoded.user_id]
         );
 
         connection.query(updateQuery, (err, rows) => {
