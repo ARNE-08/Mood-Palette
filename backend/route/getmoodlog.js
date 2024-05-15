@@ -3,11 +3,11 @@ const mysql = require("mysql");
 module.exports = async (req, res) => {
     try {
         // Log the request body for debugging
-        console.log('Request Body:', req.body);
 
         // Parse user_id from request body
-        const user_id = parseInt(req.body.user_id);
-        if (isNaN(user_id)) {
+        const user_id = req.body;
+        var decoded = jwt.verify(user_id, "ZJGX1QL7ri6BGJWj3t");
+        if (isNaN(decoded.user_id.isNaN)) {
             return res.status(400).json({
                 success: false,
                 data: null,
@@ -16,10 +16,9 @@ module.exports = async (req, res) => {
         }
 
         // Log the parsed user_id
-        console.log('Parsed user_id:', user_id);
 
         // Prepare and execute the query
-        const getMood = mysql.format("SELECT * FROM mood WHERE user_id = ?", [user_id]);
+        const getMood = mysql.format("SELECT * FROM mood WHERE user_id = ?", [decoded.user_id]);
         console.log('Executing query:', getMood); // Log the query for debugging
 
         connection.query(getMood, (err, rows) => {
