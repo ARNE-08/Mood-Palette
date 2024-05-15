@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
 
         // Username does not exist, proceed with registration
         var updateQuery = mysql.format(
-            "UPDATE user SET username = ? WHERE user_id = ?", [username, decoded.user_id]
+            "UPDATE user SET username = ? WHERE user_id = ?", [username, decoded.userId]
         );
 
         connection.query(updateQuery, (err, rows) => {

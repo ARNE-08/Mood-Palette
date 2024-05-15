@@ -1,32 +1,15 @@
 const mysql = require("mysql");
-var jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 
 module.exports = async (req, res) => {
     try {
-        // Log the request body for debugging
+        const token = req.body.user_id;
+        var decoded = jwt.verify(token, "ZJGX1QL7ri6BGJWj3t");
+        const user_id = decoded.userId;
 
-        // Parse user_id from request body
-        const user_id = req.body.user_id;
-        var decoded = jwt.verify(user_id, "ZJGX1QL7ri6BGJWj3t");
-        // console.log("decoded: ", decoded)
-        // console.log("id: ", decoded.userId)
-        if (isNaN(decoded.userId)) {
-            return res.status(400).json({
-                success: false,
-                data: null,
-                error: 'Invalid user_id',
-            });
-        }
-
-        // Log the parsed user_id
-
-        // Prepare and execute the query
-        const getMood = mysql.format("SELECT * FROM mood WHERE user_id = ?", [decoded.userId]);
-        console.log('Executing query:', getMood); // Log the query for debugging
-
+        const getMood = mysql.format("SELECT * FROM mood WHERE user_id = ?", [user_id]);
         connection.query(getMood, (err, rows) => {
             if (err) {
-                console.error('Query error:', err); // Log the error for debugging
                 return res.status(400).json({
                     success: false,
                     data: null,
@@ -34,14 +17,22 @@ module.exports = async (req, res) => {
                 });
             }
 
-            console.log('Query result:', rows); // Log the result for debugging
+            // Add one day to each date
+            rows = rows.map(row => {
+                const date = new Date(row.date);
+                date.setDate(date.getDate() + 1); // Add one day
+                return {
+                    ...row,
+                    date: date.toISOString().split('T')[0] // Format date to string
+                };
+            });
+
             return res.status(200).json({
                 success: true,
                 data: rows,
             });
         });
     } catch (error) {
-        console.error('Server error:', error); // Log any server error
         return res.status(500).json({
             success: false,
             data: null,
