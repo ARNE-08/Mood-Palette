@@ -21,6 +21,8 @@ class _HomePageState extends State<HomePage> {
 
   DateTime _currentMonth = DateTime.now().subtract(const Duration(days: 1));
   bool selectedcurrentyear = false;
+  List<dynamic> moodData = [];
+
   @override
   void initState() {
     super.initState();
@@ -28,33 +30,39 @@ class _HomePageState extends State<HomePage> {
   }
 
   void fetchMoodData() async {
-  try {
-    // Make the HTTP POST request
-    final response = await http.post(
-      Uri.parse('http://localhost:3000/getmood'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${GlobalVariables.instance.token}',
-      },
-      body: jsonEncode({'user_id': GlobalVariables.instance.token}), // Empty body or pass any required data
-    );
+    try {
+      // Make the HTTP POST request
+      final response = await http.post(
+        Uri.parse('http://localhost:3000/getmood'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${GlobalVariables.instance.token}',
+        },
+        body: jsonEncode({
+          'user_id': GlobalVariables.instance.token
+        }), // Empty body or pass any required data
+      );
 
-    // Check if the request was successful (status code 200)
-    if (response.statusCode == 200) {
-      // Parse the JSON response
-      print('Succeed to fetch mood data: ${response.statusCode}');
-      Map<String, dynamic> data = json.decode(response.body);
-
-      // Handle the mood data...
-    } else {
-      // Handle other status codes (e.g., 400, 401, etc.)
-      print('Failed to fetch mood data: ${response.statusCode}');
+      // Check if the request was successful (status code 200)
+      if (response.statusCode == 200) {
+        // Parse the JSON response directly into a list of maps
+        print('Succeed to fetch mood data: ${response.statusCode}');
+        final Map<String, dynamic> fetchedMoodData = json.decode(response.body);
+        print('fetchedd mood data: ${fetchedMoodData['data']}');
+        // Store the fetched mood data in the moodData list
+        setState(() {
+          moodData = fetchedMoodData['data'];
+          // print(moodData);
+        });
+      } else {
+        // Handle other status codes (e.g., 400, 401, etc.)
+        print('Failed to fetch mood data: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle any errors that occur during the process
+      print('Error fetching mood data: $error');
     }
-  } catch (error) {
-    // Handle any errors that occur during the process
-    print('Error fetching mood data: $error');
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +109,7 @@ class _HomePageState extends State<HomePage> {
               itemBuilder: (context, pageIndex) {
                 DateTime month =
                     DateTime(_currentMonth.year, (pageIndex % 12) + 1, 1);
-                return buildCalendar(month);
+                return buildCalendar(month, moodData);
               },
             ),
           ),
@@ -262,9 +270,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  //  Widget _buildCalendar() {--}
-  // This widget builds the detailed calendar grid for the chosen month.
-  Widget buildCalendar(DateTime month) {
+  // Modify the _buildCalendar method to accept mood data
+  Widget buildCalendar(DateTime month, List<dynamic> moodData) {
     // Calculating various details for the month's display
     int daysInMonth = DateTime(month.year, month.month + 1, 0).day;
     DateTime firstDayOfMonth = DateTime(month.year, month.month, 1);
@@ -273,19 +280,6 @@ class _HomePageState extends State<HomePage> {
     DateTime lastDayOfPreviousMonth =
         firstDayOfMonth.subtract(const Duration(days: 1));
     int daysInPreviousMonth = lastDayOfPreviousMonth.day;
-    List<Color> randomColors = [
-      const Color.fromRGBO(225, 0, 34, 1),
-      const Color.fromRGBO(0, 5, 133, 1),
-      const Color.fromRGBO(89, 251, 234, 1),
-      const Color.fromRGBO(129, 58, 173, 1),
-      const Color.fromRGBO(252, 169, 255, 1),
-      const Color.fromRGBO(157, 156, 194, 1),
-      const Color.fromRGBO(0, 148, 122, 1),
-      const Color.fromRGBO(254, 105, 0, 1),
-      const Color.fromRGBO(255, 245, 0, 1),
-      const Color.fromRGBO(0, 153, 218, 1),
-      const Color.fromRGBO(108, 217, 164, 1),
-    ];
 
     return GridView.builder(
       padding: const EdgeInsets.all(8.0),
@@ -293,39 +287,81 @@ class _HomePageState extends State<HomePage> {
         crossAxisCount: 7,
         childAspectRatio: 1,
       ),
-      // Calculating the total number of cells required in the grid
       itemCount: daysInMonth + weekdayOfFirstDay - 1,
       itemBuilder: (context, index) {
         if (index < weekdayOfFirstDay - 1) {
-          // Displaying dates from the previous month in grey
+          // Calculate the day from the previous month
           int previousMonthDay =
-              daysInPreviousMonth - (weekdayOfFirstDay - index) + 2;
+              daysInPreviousMonth - (weekdayOfFirstDay - 1) + index;
           DateTime date =
-              DateTime(month.year, month.month, index - weekdayOfFirstDay + 2);
+              DateTime(month.year, month.month - 1, previousMonthDay);
 
           return buildDayContainer(
-              previousMonthDay,
-              const Color.fromRGBO(217, 217, 217, 1),
-              date); // Function to build day container
+              previousMonthDay, const Color.fromRGBO(217, 217, 217, 1), date);
         } else {
-          // Displaying the current month's days
+          // Calculate the day within the current month
           DateTime date =
               DateTime(month.year, month.month, index - weekdayOfFirstDay + 2);
-          // ! set to generate color to the day before today
-          Color dayColor = date
-                  .isBefore(DateTime.now().subtract(Duration(days: 1)))
-              ? randomColors[Random().nextInt(randomColors.length)]
-              : const Color.fromRGBO(
-                  217, 217, 217, 1); // Check if the date is before yesterday
-          // Check if the date is before today
-          String text = date.day.toString();
+          Color dayColor = const Color.fromRGBO(217, 217, 217, 1);
+
+          // Check if the mood data contains a mood for the current date
+          Map<String, dynamic>? mood = moodData.firstWhere(
+            (mood) =>
+                DateTime.parse(mood['date']).year == date.year &&
+                DateTime.parse(mood['date']).month == date.month &&
+                DateTime.parse(mood['date']).day == date.day,
+            orElse: () =>
+                <String, dynamic>{}, // return an empty map instead of null
+          );
+          // If mood data exists, determine the color based on the mood
+          if (mood != null) {
+            // print('Mood: ${mood['mood']}');
+            switch (mood['mood']) {
+              case 'Angry':
+                dayColor = Color.fromRGBO(255, 0, 34, 1);
+                break;
+              case 'Sad':
+                dayColor = Color.fromRGBO(0, 5, 133, 1);
+                break;
+              case 'Calm':
+                dayColor = Color.fromRGBO(89, 251, 234, 1);
+                break;
+              case 'Worried':
+                dayColor = Color.fromRGBO(129, 58, 173, 1);
+                break;
+              case 'Embarrassed':
+                dayColor = Color.fromRGBO(252, 169, 255, 1);
+                break;
+              case 'Uncomfortable':
+                dayColor = Color.fromRGBO(157, 156, 194, 1);
+                break;
+              case 'Confused':
+                dayColor = Color.fromRGBO(0, 148, 122, 1);
+                break;
+              case 'Excited':
+                dayColor = Color.fromRGBO(254, 105, 0, 1);
+                break;
+              case 'Happy':
+                dayColor = Color.fromRGBO(255, 245, 0, 1);
+                break;
+              case 'Bored':
+                dayColor = Color.fromRGBO(0, 153, 218, 1);
+                break;
+              case 'Chill':
+                dayColor = Color.fromRGBO(108, 217, 164, 1);
+                break;
+              default:
+                // Handle unknown mood
+                dayColor = Color.fromRGBO(217, 217, 217, 1);
+                break;
+            }
+          }
 
           return InkWell(
             onTap: () {
               // Handle tap on a date cell
             },
-            child: buildDayContainer(
-                text, dayColor, date), // Function to build day container
+            child: buildDayContainer(date.day, dayColor, date),
           );
         }
       },
