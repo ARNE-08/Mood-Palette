@@ -1,13 +1,16 @@
 const mysql = require("mysql");
+var jwt = require("jsonwebtoken");
 
 module.exports = async (req, res) => {
     try {
         // Log the request body for debugging
-        console.log('Request Body:', req.body);
 
         // Parse user_id from request body
-        const user_id = parseInt(req.body.user_id);
-        if (isNaN(user_id)) {
+        const user_id = req.body.user_id;
+        var decoded = jwt.verify(user_id, "ZJGX1QL7ri6BGJWj3t");
+        // console.log("decoded: ", decoded)
+        // console.log("id: ", decoded.userId)
+        if (isNaN(decoded.userId)) {
             return res.status(400).json({
                 success: false,
                 data: null,
@@ -16,10 +19,9 @@ module.exports = async (req, res) => {
         }
 
         // Log the parsed user_id
-        console.log('Parsed user_id:', user_id);
 
         // Prepare and execute the query
-        const getMood = mysql.format("SELECT * FROM mood WHERE user_id = ?", [user_id]);
+        const getMood = mysql.format("SELECT * FROM mood WHERE user_id = ?", [decoded.userId]);
         console.log('Executing query:', getMood); // Log the query for debugging
 
         connection.query(getMood, (err, rows) => {
