@@ -3,6 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mood_palette/widget/navbar.dart';
 import 'dart:math';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:mood_palette/main.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,7 +24,37 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    fetchMoodData();
   }
+
+  void fetchMoodData() async {
+  try {
+    // Make the HTTP POST request
+    final response = await http.post(
+      Uri.parse('http://localhost:3000/getmood'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${GlobalVariables.instance.token}',
+      },
+      body: jsonEncode({'user_id': GlobalVariables.instance.token}), // Empty body or pass any required data
+    );
+
+    // Check if the request was successful (status code 200)
+    if (response.statusCode == 200) {
+      // Parse the JSON response
+      print('Succeed to fetch mood data: ${response.statusCode}');
+      Map<String, dynamic> data = json.decode(response.body);
+
+      // Handle the mood data...
+    } else {
+      // Handle other status codes (e.g., 400, 401, etc.)
+      print('Failed to fetch mood data: ${response.statusCode}');
+    }
+  } catch (error) {
+    // Handle any errors that occur during the process
+    print('Error fetching mood data: $error');
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -112,22 +145,22 @@ class _HomePageState extends State<HomePage> {
                   }
                 },
               ),
-              DropdownButton<String>(
+              DropdownButton<int>(
                 // Dropdown for selecting a month
                 underline: const SizedBox(),
                 dropdownColor: Colors.grey[700],
                 iconSize: 0.0,
                 style: const TextStyle(color: Colors.white),
-                value: DateFormat('MMMM').format(_currentMonth),
-                onChanged: (String? selectedMonth) {
+                value: _currentMonth.month,
+                onChanged: (int? selectedMonth) {
                   if (selectedMonth != null) {
                     setState(() {
                       // Updates the current month based on the selected month
-                      _currentMonth = DateTime.parse(
-                          '${DateTime.now().year}-$selectedMonth-01');
+                      _currentMonth =
+                          DateTime(_currentMonth.year, selectedMonth, 1);
 
                       // Calculates the month index based on the selected month and sets the page
-                      int monthIndex = _currentMonth.month - 1;
+                      int monthIndex = selectedMonth - 1;
                       _pageController.jumpToPage(monthIndex);
                     });
                   }
@@ -135,11 +168,12 @@ class _HomePageState extends State<HomePage> {
                 items: [
                   // Generates DropdownMenuItems for each month
                   for (int month = 1; month <= 12; month++)
-                    DropdownMenuItem<String>(
-                      value: DateFormat('MMMM')
-                          .format(DateTime(DateTime.now().year, month, 1)),
-                      child: Text(DateFormat('MMMM')
-                          .format(DateTime(DateTime.now().year, month, 1))),
+                    DropdownMenuItem<int>(
+                      value: month,
+                      child: Text(
+                        DateFormat('MMMM')
+                            .format(DateTime(_currentMonth.year, month, 1)),
+                      ),
                     ),
                 ],
               ),
@@ -278,10 +312,12 @@ class _HomePageState extends State<HomePage> {
           DateTime date =
               DateTime(month.year, month.month, index - weekdayOfFirstDay + 2);
           // ! set to generate color to the day before today
-          Color dayColor = date.isBefore(DateTime.now().subtract(Duration(days: 1)))
+          Color dayColor = date
+                  .isBefore(DateTime.now().subtract(Duration(days: 1)))
               ? randomColors[Random().nextInt(randomColors.length)]
-              : const Color.fromRGBO(217, 217, 217, 1); // Check if the date is before yesterday
- // Check if the date is before today
+              : const Color.fromRGBO(
+                  217, 217, 217, 1); // Check if the date is before yesterday
+          // Check if the date is before today
           String text = date.day.toString();
 
           return InkWell(
@@ -342,7 +378,9 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 20), // Add space between the header and the blocks
+                        SizedBox(
+                            height:
+                                20), // Add space between the header and the blocks
                         Wrap(
                           alignment: WrapAlignment.spaceEvenly,
                           children: [
