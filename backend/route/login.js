@@ -44,7 +44,7 @@ module.exports = (req, res) => {
                     res.status(200).json({
                         success: true,
                         message: "Login credential is correct",
-                        data: rows[0] && rows[0].username,
+                        data: rows[0] && rows[0].username && token,
                     });
                 } else {
                     res.status(400).json({

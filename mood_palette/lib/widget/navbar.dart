@@ -90,7 +90,7 @@ class NavBar extends StatelessWidget {
                       iconSize: 35,
                     ), 
                     Text(
-                      'PROFILE', // Tiny text
+                      'INFO', // Tiny text
                       style: GoogleFonts.poppins( // Use Google Fonts
                         fontSize: 12, // Adjust font size as needed
                       ),

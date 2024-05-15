@@ -21,16 +21,14 @@ class ProfilePage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextFormField(
-                  controller: _usernameController,
-                  decoration: const InputDecoration(
-                    hintText: 'USERNAME',
-                    hintStyle: TextStyle(color: Colors.black),
-                    border: InputBorder.none, // Remove border
-                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide.none),
+                SizedBox(height: 10),
+                Text(
+                  'USERNAME',
+                  style: GoogleFonts.singleDay(
+                    textStyle: TextStyle(
+                      fontSize: 36,
+                    ),
                   ),
-                  style: GoogleFonts.singleDay(fontSize: 36, color: Colors.black),
-                  textAlign: TextAlign.center,
                 ),
               ],
             ),
@@ -41,8 +39,9 @@ class ProfilePage extends StatelessWidget {
         children: [
           Center(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              // mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                SizedBox(height: 40),
                 Text(
                   'HAVE A NICE DAY!',
                   style: GoogleFonts.singleDay(
@@ -121,15 +120,12 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.all(40.0),
                   child: MyElevatedButton(
                     width: double.infinity,
                     onPressed: () {
                       // Navigate to the HomePage
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginPage()),
-                      );
+                      Navigator.pushNamed(context, '/login'); // Navigate to the HomePage
                     },
                     borderRadius: BorderRadius.circular(50),
                     child: Text(
