@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pie_chart/pie_chart.dart';
-// import 'package:intl/intl.dart';
+import 'package:pie_chart/pie_chart.dart';import 'package:intl/intl.dart';
 import 'package:mood_palette/widget/navbar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -18,6 +17,11 @@ class StatPage extends StatefulWidget {
 class _StatPageState extends State<StatPage> {
   Map<String, double> moodData = {};
   bool dataFetched = false;
+  final PageController _pageController =
+      PageController(initialPage: DateTime.now().month - 1);
+
+  DateTime _currentMonth = DateTime.now().subtract(const Duration(days: 1));
+  bool selectedcurrentyear = false;
 
   Map<String, Color> moodColors = {
     'Angry': const Color.fromRGBO(255, 0, 34, 1),
@@ -360,6 +364,130 @@ class _StatPageState extends State<StatPage> {
             right: 0,
             bottom: 0,
             child: NavBar(),
+          ),
+          _buildHeader(),
+          
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    // Checks if the current month is the last month of the year (December)
+    bool isLastMonthOfYear = _currentMonth.month == 12;
+
+    return Center(
+      child: Column(
+        children: [
+          const SizedBox(height: 70),
+          Container(
+            width: 215,
+            height: 35,
+            decoration: BoxDecoration(
+              color: const Color.fromRGBO(91, 188, 255, 1),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_ios),
+                  color: Colors.white,
+                  iconSize: 12,
+                  onPressed: () {
+                    // Moves to the previous page if the current page index is greater than 0
+                    if (_pageController.page! > 0) {
+                      _pageController.previousPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    }
+                  },
+                ),
+                DropdownButton<int>(
+                  // Dropdown for selecting a month
+                  underline: const SizedBox(),
+                  dropdownColor: Colors.grey[700],
+                  iconSize: 0.0,
+                  style: const TextStyle(color: Colors.white),
+                  value: _currentMonth.month,
+                  onChanged: (int? selectedMonth) {
+                    if (selectedMonth != null) {
+                      setState(() {
+                        // Updates the current month based on the selected month
+                        _currentMonth =
+                            DateTime(_currentMonth.year, selectedMonth, 1);
+      
+                        // Calculates the month index based on the selected month and sets the page
+                        int monthIndex = selectedMonth - 1;
+                        _pageController.jumpToPage(monthIndex);
+                      });
+                    }
+                  },
+                  items: [
+                    // Generates DropdownMenuItems for each month
+                    for (int month = 1; month <= 12; month++)
+                      DropdownMenuItem<int>(
+                        value: month,
+                        child: Text(
+                          DateFormat('MMMM')
+                              .format(DateTime(_currentMonth.year, month, 1)),
+                        ),
+                      ),
+                  ],
+                ),
+                DropdownButton<int>(
+                  // Dropdown for selecting a year
+                  underline: const SizedBox(),
+                  style: const TextStyle(color: Colors.white),
+                  dropdownColor: Colors.grey[700],
+                  iconSize: 0.0,
+                  value: _currentMonth.year,
+                  onChanged: (int? year) {
+                    if (year != null) {
+                      setState(() {
+                        // Sets the current month to January of the selected year
+                        _currentMonth = DateTime(year, 1, 1);
+      
+                        // Calculates the month index based on the selected year and sets the page
+                        int yearDiff = DateTime.now().year - year;
+                        int monthIndex = 12 * yearDiff + _currentMonth.month - 1;
+                        _pageController.jumpToPage(monthIndex);
+                      });
+                    }
+                  },
+                  items: [
+                    // Generates DropdownMenuItems for a range of years from current year to 10 years ahead
+                    for (int year = DateTime.now().year;
+                        year <= DateTime.now().year + 10;
+                        year++)
+                      DropdownMenuItem<int>(
+                        value: year,
+                        child: Text(
+                          year.toString(),
+                        ),
+                      ),
+                  ],
+                ),
+                IconButton(
+                  icon: const Icon(Icons.arrow_forward_ios),
+                  color: Colors.white,
+                  iconSize: 12,
+                  onPressed: () {
+                    // Moves to the next page if it's not the last month of the year
+                    if (!isLastMonthOfYear) {
+                      setState(() {
+                        _pageController.nextPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),
