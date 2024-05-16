@@ -318,41 +318,41 @@ class _HomePageState extends State<HomePage> {
             // print('Mood: ${mood['mood']}');
             switch (mood['mood']) {
               case 'Angry':
-                dayColor = Color.fromRGBO(255, 0, 34, 1);
+                dayColor = const Color.fromRGBO(255, 0, 34, 1);
                 break;
               case 'Sad':
-                dayColor = Color.fromRGBO(0, 5, 133, 1);
+                dayColor = const Color.fromRGBO(0, 5, 133, 1);
                 break;
               case 'Calm':
-                dayColor = Color.fromRGBO(89, 251, 234, 1);
+                dayColor = const Color.fromRGBO(89, 251, 234, 1);
                 break;
               case 'Worried':
-                dayColor = Color.fromRGBO(129, 58, 173, 1);
+                dayColor = const Color.fromRGBO(129, 58, 173, 1);
                 break;
               case 'Embarrassed':
-                dayColor = Color.fromRGBO(252, 169, 255, 1);
+                dayColor = const Color.fromRGBO(252, 169, 255, 1);
                 break;
               case 'Uncomfortable':
-                dayColor = Color.fromRGBO(157, 156, 194, 1);
+                dayColor = const Color.fromRGBO(157, 156, 194, 1);
                 break;
               case 'Confused':
-                dayColor = Color.fromRGBO(0, 148, 122, 1);
+                dayColor = const Color.fromRGBO(0, 148, 122, 1);
                 break;
               case 'Excited':
-                dayColor = Color.fromRGBO(254, 105, 0, 1);
+                dayColor = const Color.fromRGBO(254, 105, 0, 1);
                 break;
               case 'Happy':
-                dayColor = Color.fromRGBO(255, 245, 0, 1);
+                dayColor = const Color.fromRGBO(255, 245, 0, 1);
                 break;
               case 'Bored':
-                dayColor = Color.fromRGBO(0, 153, 218, 1);
+                dayColor = const Color.fromRGBO(0, 153, 218, 1);
                 break;
               case 'Chill':
-                dayColor = Color.fromRGBO(108, 217, 164, 1);
+                dayColor = const Color.fromRGBO(108, 217, 164, 1);
                 break;
               default:
                 // Handle unknown mood
-                dayColor = Color.fromRGBO(217, 217, 217, 1);
+                dayColor = const Color.fromRGBO(217, 217, 217, 1);
                 break;
             }
           }
@@ -374,28 +374,42 @@ class _HomePageState extends State<HomePage> {
         date.month == DateTime.now().month &&
         date.day == DateTime.now().day;
 
+    bool isTomorrow = date.year == DateTime.now().year &&
+        date.month == DateTime.now().month &&
+        date.day == DateTime.now().day + 1;
+
+    // Check if there is mood data for today
+    bool hasMoodDataForToday = moodData.any((mood) =>
+        DateTime.parse(mood['date']).year == date.year &&
+        DateTime.parse(mood['date']).month == date.month &&
+        DateTime.parse(mood['date']).day == date.day);
+
+    // Check if there is mood data for tomorrow
+    bool hasMoodDataForTomorrow = moodData.any((mood) =>
+        DateTime.parse(mood['date']).year == date.year &&
+        DateTime.parse(mood['date']).month == date.month &&
+        DateTime.parse(mood['date']).day == date.day + 1);
+
     return Padding(
       padding: const EdgeInsets.all(0.0),
       child: GestureDetector(
         onTap: () {
           if (isToday) {
-            // Handle tap to show bottom sheet
             showModalBottomSheet(
               context: context,
               builder: (context) {
-                // Replace this with your bottom sheet widget
                 return ClipRRect(
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(40),
                     topRight: Radius.circular(40),
                   ),
                   child: Container(
-                    color: Color.fromRGBO(255, 209, 227, 1),
+                    color: const Color.fromRGBO(255, 209, 227, 1),
                     height: 500,
                     width: double.infinity,
                     child: Column(
                       children: [
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Container(
                           padding: const EdgeInsets.all(8.0),
                           width: 305,
@@ -414,7 +428,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                             height:
                                 20), // Add space between the header and the blocks
                         Wrap(
@@ -452,7 +466,17 @@ class _HomePageState extends State<HomePage> {
                   color: color,
                 ),
                 child: Center(
-                  child: isToday ? Icon(Icons.add, color: Colors.white) : null,
+                  child: (() {
+                    if (isTomorrow && !hasMoodDataForTomorrow && hasMoodDataForToday) {
+                      return const Icon(Icons.add, color: Colors.white);
+                    } else if (isTomorrow && !hasMoodDataForTomorrow) {
+                      return const Icon(Icons.add, color: Colors.white);
+                    } else if (isToday && !hasMoodDataForToday)  {
+                      return const Icon(Icons.add, color: Colors.white);
+                    } else {
+                      return null;
+                    }
+                  })(),
                 ),
               ),
             ),
@@ -460,7 +484,7 @@ class _HomePageState extends State<HomePage> {
                 height: 2), // Adjust spacing between the box and the text
             Text(
               content.toString(),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 10.0,
                 color: Colors.black,
               ),
