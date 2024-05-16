@@ -157,22 +157,17 @@ class _StatPageState extends State<StatPage> {
                             alignment: Alignment.center,
                             children: [
                               AspectRatio(
-                                aspectRatio: 1,
+                                aspectRatio: 0.8,
                                 child: PieChart(
                                   dataMap: Map<String, double>.fromEntries(
-                                      sortedEntries),
-                                  animationDuration:
-                                      const Duration(milliseconds: 800),
-                                  chartLegendSpacing: 1,
-                                  chartRadius:
-                                      MediaQuery.of(context).size.width / 2,
-                                  colorList: moodData.keys
-                                      .map((mood) =>
-                                          moodColors[mood] ?? Colors.black)
-                                      .toList(),
-                                  initialAngleInDegree: 0,
+                                      sortedEntries), // Use sortedEntries to populate dataMap
+                                  colorList: sortedEntries
+                                      .map((entry) =>
+                                          moodColors[entry.key] ?? Colors.black)
+                                      .toList(), // Use moodColors for colorList
                                   chartType: ChartType.ring,
                                   ringStrokeWidth: 60,
+                                  chartRadius: MediaQuery.of(context).size.width * 0.6,
                                   chartValuesOptions: ChartValuesOptions(
                                     showChartValues: false,
                                     showChartValuesInPercentage: true,
