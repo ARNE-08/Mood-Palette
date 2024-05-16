@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pie_chart/pie_chart.dart';import 'package:intl/intl.dart';
+import 'package:pie_chart/pie_chart.dart';
+import 'package:intl/intl.dart';
 import 'package:mood_palette/widget/navbar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -36,13 +37,14 @@ class _StatPageState extends State<StatPage> {
     'Sad': const Color.fromRGBO(0, 5, 133, 1),
     'Worried': const Color.fromRGBO(129, 58, 173, 1),
   };
+
   @override
   void initState() {
     super.initState();
-    fetchMoodData();
+    fetchMoodData(_currentMonth.year, _currentMonth.month);
   }
 
-  void fetchMoodData() async {
+  void fetchMoodData(int year, int month) async {
     try {
       final response = await http.post(
         Uri.parse('http://localhost:3000/getmood'),
@@ -50,7 +52,11 @@ class _StatPageState extends State<StatPage> {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ${GlobalVariables.instance.token}',
         },
-        body: jsonEncode({'user_id': GlobalVariables.instance.token}),
+        body: jsonEncode({
+          'user_id': GlobalVariables.instance.token,
+          'year': year,
+          'month': month,
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -59,32 +65,13 @@ class _StatPageState extends State<StatPage> {
         // Assuming mood data is under the key 'data'
         List<dynamic> moodDataList = data['data'];
 
-        // Filter mood data for the current month
-        DateTime now = DateTime.now();
-        int currentYear = now.year;
-        int currentMonth = now.month;
-        int currentDay = now.day; // Current day
-
-        moodDataList = moodDataList.where((item) {
-          // Parse the date
-          String dateString =
-              item['date'].substring(0, 10); // Extract yyyy-MM-dd part
-          DateTime date = DateTime.parse(dateString); // Parse date
-          date = date.add(Duration(days: 1)); // Add one day to the date
-          print('Processing date: $date');
-          int itemYear = date.year;
-          int itemMonth = date.month;
-          int itemDay = date.day; // Day from fetched data
-
-          // Compare dates without considering the time part
-          return itemYear == currentYear &&
-              itemMonth == currentMonth &&
-              itemDay >= 1 &&
-              itemDay <= DateTime(itemYear, itemMonth + 1, 0).day;
-        }).toList();
-
         setState(() {
           moodData = {}; // Clear previous data
+          moodDataList = moodDataList.where((item) {
+            DateTime date = DateTime.parse(item['date']).toLocal();
+            return date.year == year && date.month == month;
+          }).toList();
+
           moodDataList.forEach((item) {
             String mood = item['mood'];
             moodData[mood] = (moodData[mood] ?? 0) + 1;
@@ -102,38 +89,6 @@ class _StatPageState extends State<StatPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (!dataFetched) {
-      return Scaffold(
-        backgroundColor: const Color.fromRGBO(255, 254, 234, 1),
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: const Color.fromRGBO(255, 254, 234, 1),
-          elevation: 0,
-          title: Padding(
-            padding: const EdgeInsets.only(top: 30),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'MoodPalette',
-                  style: GoogleFonts.singleDay(
-                    textStyle: const TextStyle(
-                      fontSize: 36,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Icon(Icons.calendar_today),
-              ],
-            ),
-          ),
-        ),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
     double sum = moodData.isNotEmpty
         ? moodData.values.reduce((value, element) => value + element)
         : 0.0;
@@ -144,20 +99,6 @@ class _StatPageState extends State<StatPage> {
         .map((entry) => MapEntry<String, double>(entry.key, entry.value))
         .toList()
       ..sort((a, b) => b.value.compareTo(a.value));
-
-    final List<Color> colorList = [
-      const Color.fromRGBO(255, 0, 34, 1),
-      const Color.fromRGBO(254, 105, 0, 1),
-      const Color.fromRGBO(255, 245, 0, 1),
-      const Color.fromRGBO(157, 156, 194, 1),
-      const Color.fromRGBO(0, 148, 122, 1),
-      const Color.fromRGBO(108, 217, 164, 1),
-      const Color.fromRGBO(89, 251, 234, 1),
-      const Color.fromRGBO(252, 169, 255, 1),
-      const Color.fromRGBO(0, 153, 218, 1),
-      const Color.fromRGBO(0, 5, 133, 1),
-      const Color.fromRGBO(129, 58, 173, 1),
-    ];
 
     return Scaffold(
       backgroundColor: const Color.fromRGBO(255, 254, 234, 1),
@@ -366,14 +307,12 @@ class _StatPageState extends State<StatPage> {
             child: NavBar(),
           ),
           _buildHeader(),
-          
         ],
       ),
     );
   }
 
   Widget _buildHeader() {
-    // Checks if the current month is the last month of the year (December)
     bool isLastMonthOfYear = _currentMonth.month == 12;
 
     return Center(
@@ -396,17 +335,16 @@ class _StatPageState extends State<StatPage> {
                   color: Colors.white,
                   iconSize: 12,
                   onPressed: () {
-                    // Moves to the previous page if the current page index is greater than 0
-                    if (_pageController.page! > 0) {
-                      _pageController.previousPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    }
+                    setState(() {
+                      _currentMonth = DateTime(
+                          _currentMonth.year, _currentMonth.month - 1, 1);
+                      fetchMoodData(_currentMonth.year, _currentMonth.month);
+                      int monthIndex = _currentMonth.month - 1;
+                      _pageController.jumpToPage(monthIndex);
+                    });
                   },
                 ),
                 DropdownButton<int>(
-                  // Dropdown for selecting a month
                   underline: const SizedBox(),
                   dropdownColor: Colors.grey[700],
                   iconSize: 0.0,
@@ -415,18 +353,15 @@ class _StatPageState extends State<StatPage> {
                   onChanged: (int? selectedMonth) {
                     if (selectedMonth != null) {
                       setState(() {
-                        // Updates the current month based on the selected month
                         _currentMonth =
                             DateTime(_currentMonth.year, selectedMonth, 1);
-      
-                        // Calculates the month index based on the selected month and sets the page
+                        fetchMoodData(_currentMonth.year, selectedMonth);
                         int monthIndex = selectedMonth - 1;
                         _pageController.jumpToPage(monthIndex);
                       });
                     }
                   },
                   items: [
-                    // Generates DropdownMenuItems for each month
                     for (int month = 1; month <= 12; month++)
                       DropdownMenuItem<int>(
                         value: month,
@@ -438,7 +373,6 @@ class _StatPageState extends State<StatPage> {
                   ],
                 ),
                 DropdownButton<int>(
-                  // Dropdown for selecting a year
                   underline: const SizedBox(),
                   style: const TextStyle(color: Colors.white),
                   dropdownColor: Colors.grey[700],
@@ -447,18 +381,16 @@ class _StatPageState extends State<StatPage> {
                   onChanged: (int? year) {
                     if (year != null) {
                       setState(() {
-                        // Sets the current month to January of the selected year
                         _currentMonth = DateTime(year, 1, 1);
-      
-                        // Calculates the month index based on the selected year and sets the page
+                        fetchMoodData(year, _currentMonth.month);
                         int yearDiff = DateTime.now().year - year;
-                        int monthIndex = 12 * yearDiff + _currentMonth.month - 1;
+                        int monthIndex =
+                            12 * yearDiff + _currentMonth.month - 1;
                         _pageController.jumpToPage(monthIndex);
                       });
                     }
                   },
                   items: [
-                    // Generates DropdownMenuItems for a range of years from current year to 10 years ahead
                     for (int year = DateTime.now().year;
                         year <= DateTime.now().year + 10;
                         year++)
@@ -475,15 +407,13 @@ class _StatPageState extends State<StatPage> {
                   color: Colors.white,
                   iconSize: 12,
                   onPressed: () {
-                    // Moves to the next page if it's not the last month of the year
-                    if (!isLastMonthOfYear) {
-                      setState(() {
-                        _pageController.nextPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      });
-                    }
+                    setState(() {
+                      _currentMonth = DateTime(
+                          _currentMonth.year, _currentMonth.month + 1, 1);
+                      fetchMoodData(_currentMonth.year, _currentMonth.month);
+                      int monthIndex = _currentMonth.month - 1;
+                      _pageController.jumpToPage(monthIndex);
+                    });
                   },
                 ),
               ],
