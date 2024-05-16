@@ -279,7 +279,21 @@ class _HomePageState extends State<HomePage> {
 
     DateTime lastDayOfPreviousMonth =
         firstDayOfMonth.subtract(const Duration(days: 1));
+
     int daysInPreviousMonth = lastDayOfPreviousMonth.day;
+
+    bool checkMoodDataForToday() {
+      DateTime today = DateTime.now();
+      return moodData.any((mood) {
+        DateTime moodDate = DateTime.parse(mood['date']);
+        return moodDate.year == today.year &&
+            moodDate.month == today.month &&
+            moodDate.day == today.day;
+      });
+    }
+
+    // Store the result in the hasMoodDataForToday variable
+    bool hasMoodDataForToday = checkMoodDataForToday();
 
     return GridView.builder(
       padding: const EdgeInsets.all(8.0),
@@ -297,7 +311,7 @@ class _HomePageState extends State<HomePage> {
               DateTime(month.year, month.month - 1, previousMonthDay);
 
           return buildDayContainer(
-              previousMonthDay, const Color.fromRGBO(217, 217, 217, 1), date);
+              previousMonthDay, const Color.fromRGBO(217, 217, 217, 1), date, hasMoodDataForToday);
         } else {
           // Calculate the day within the current month
           DateTime date =
@@ -361,14 +375,14 @@ class _HomePageState extends State<HomePage> {
             onTap: () {
               // Handle tap on a date cell
             },
-            child: buildDayContainer(date.day, dayColor, date),
+            child: buildDayContainer(date.day, dayColor, date, hasMoodDataForToday),
           );
         }
       },
     );
   }
 
-  Widget buildDayContainer(dynamic content, Color color, DateTime date) {
+  Widget buildDayContainer(dynamic content, Color color, DateTime date, bool hasMoodDataForToday) {
     // Check if the date is today
     bool isToday = date.year == DateTime.now().year &&
         date.month == DateTime.now().month &&
@@ -378,11 +392,11 @@ class _HomePageState extends State<HomePage> {
         date.month == DateTime.now().month &&
         date.day == DateTime.now().day + 1;
 
-    // Check if there is mood data for today
-    bool hasMoodDataForToday = moodData.any((mood) =>
-        DateTime.parse(mood['date']).year == date.year &&
-        DateTime.parse(mood['date']).month == date.month &&
-        DateTime.parse(mood['date']).day == date.day);
+    // // Check if there is mood data for today
+    // bool hasMoodDataForToday = moodData.any((mood) =>
+    //     DateTime.parse(mood['date']).year == date.year &&
+    //     DateTime.parse(mood['date']).month == date.month &&
+    //     DateTime.parse(mood['date']).day == date.day);
 
     // Check if there is mood data for tomorrow
     bool hasMoodDataForTomorrow = moodData.any((mood) =>
@@ -467,12 +481,11 @@ class _HomePageState extends State<HomePage> {
                 ),
                 child: Center(
                   child: (() {
-                    // if (isTomorrow && !hasMoodDataForTomorrow && hasMoodDataForToday) {
-                    //   return const Icon(Icons.add, color: Colors.white);
-                    // } else if (isTomorrow && !hasMoodDataForTomorrow) {
-                    //   return const Icon(Icons.add, color: Colors.white);
-                    // } else if (isToday && !hasMoodDataForToday)  {
-                    if (isToday && !hasMoodDataForToday)  {
+                    if (isTomorrow && hasMoodDataForToday) {
+                      return const Icon(Icons.add, color: Colors.white);
+                      // } else if (isTomorrow && !hasMoodDataForTomorrow) {
+                      //   return const Icon(Icons.add, color: Colors.white);
+                    } else if (isToday && !hasMoodDataForToday) {
                       return const Icon(Icons.add, color: Colors.white);
                     } else {
                       return null;
