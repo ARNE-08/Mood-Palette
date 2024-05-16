@@ -225,12 +225,12 @@ class _StatPageState extends State<StatPage> {
                           ),
                         if (moodData.isEmpty)
                           const Padding(
-                            padding: EdgeInsets.all(20.0),
+                            padding: EdgeInsets.all(80.0),
                             child: Text(
                               'No mood data available.',
                               style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
+                                fontSize: 36,
+                                fontWeight: FontWeight.normal,
                               ),
                             ),
                           ),
@@ -241,6 +241,9 @@ class _StatPageState extends State<StatPage> {
                             children:
                                 List.generate(sortedEntries.length, (index) {
                               final entry = sortedEntries[index];
+                              final double percentage = entry.value;
+                              final int count =
+                                  (percentage * sum / 100).toInt();
                               return Padding(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 5.0),
@@ -266,26 +269,55 @@ class _StatPageState extends State<StatPage> {
                                             ),
                                           ),
                                           const SizedBox(height: 4),
-                                          LinearProgressIndicator(
-                                            value: entry.value / 100,
-                                            backgroundColor: Colors.grey[300],
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                              moodColors[entry.key] ??
-                                                  Colors.black,
-                                            ),
+                                          Stack(
+                                            children: [
+                                              Container(
+                                                height: 10,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey[300],
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                ),
+                                              ),
+                                              FractionallySizedBox(
+                                                widthFactor: percentage / 100,
+                                                child: Container(
+                                                  height: 10,
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        moodColors[entry.key] ??
+                                                            Colors.black,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                '$count',
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              Text(
+                                                '${percentage.toStringAsFixed(0)}%',
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
                                     ),
-                                    Text(
-                                      '${(entry.value * sum / 100).toStringAsFixed(0)}',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 50),
                                   ],
                                 ),
                               );
