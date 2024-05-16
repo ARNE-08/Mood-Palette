@@ -467,11 +467,12 @@ class _HomePageState extends State<HomePage> {
                 ),
                 child: Center(
                   child: (() {
-                    if (isTomorrow && !hasMoodDataForTomorrow && hasMoodDataForToday) {
-                      return const Icon(Icons.add, color: Colors.white);
-                    } else if (isTomorrow && !hasMoodDataForTomorrow) {
-                      return const Icon(Icons.add, color: Colors.white);
-                    } else if (isToday && !hasMoodDataForToday)  {
+                    // if (isTomorrow && !hasMoodDataForTomorrow && hasMoodDataForToday) {
+                    //   return const Icon(Icons.add, color: Colors.white);
+                    // } else if (isTomorrow && !hasMoodDataForTomorrow) {
+                    //   return const Icon(Icons.add, color: Colors.white);
+                    // } else if (isToday && !hasMoodDataForToday)  {
+                    if (isToday && !hasMoodDataForToday)  {
                       return const Icon(Icons.add, color: Colors.white);
                     } else {
                       return null;
