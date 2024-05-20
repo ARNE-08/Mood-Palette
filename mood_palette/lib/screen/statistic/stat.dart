@@ -67,15 +67,23 @@ class _StatPageState extends State<StatPage> {
 
         setState(() {
           moodData = {}; // Clear previous data
-          moodDataList = moodDataList.where((item) {
-            DateTime date = DateTime.parse(item['date']).toLocal();
-            return date.year == year && date.month == month;
-          }).toList();
 
-          moodDataList.forEach((item) {
-            String mood = item['mood'];
-            moodData[mood] = (moodData[mood] ?? 0) + 1;
-          });
+          if (moodDataList.isEmpty) {
+            // Set all mood values to 0 if no data is available
+            moodColors.keys.forEach((mood) {
+              moodData[mood] = 0;
+            });
+          } else {
+            moodDataList = moodDataList.where((item) {
+              DateTime date = DateTime.parse(item['date']).toLocal();
+              return date.year == year && date.month == month;
+            }).toList();
+
+            moodDataList.forEach((item) {
+              String mood = item['mood'];
+              moodData[mood] = (moodData[mood] ?? 0) + 1;
+            });
+          }
 
           dataFetched = true;
         });
@@ -167,7 +175,8 @@ class _StatPageState extends State<StatPage> {
                                       .toList(), // Use moodColors for colorList
                                   chartType: ChartType.ring,
                                   ringStrokeWidth: 60,
-                                  chartRadius: MediaQuery.of(context).size.width * 0.6,
+                                  chartRadius:
+                                      MediaQuery.of(context).size.width * 0.6,
                                   chartValuesOptions: ChartValuesOptions(
                                     showChartValues: false,
                                     showChartValuesInPercentage: true,
@@ -219,15 +228,170 @@ class _StatPageState extends State<StatPage> {
                             ],
                           ),
                         if (moodData.isEmpty)
-                          const Padding(
-                            padding: EdgeInsets.all(80.0),
-                            child: Text(
-                              'No mood data available.',
-                              style: TextStyle(
-                                fontSize: 36,
-                                fontWeight: FontWeight.normal,
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Render pie chart with value 0
+                              Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  AspectRatio(
+                                    aspectRatio: 0.8,
+                                    child: PieChart(
+                                      dataMap: moodColors.map((key, value) =>
+                                          MapEntry(
+                                              key, 0)), // Set all values to 0
+                                      colorList: moodColors.values
+                                          .toList(), // Use moodColors for colors
+                                      chartType: ChartType.ring,
+                                      ringStrokeWidth: 60,
+                                      chartRadius:
+                                          MediaQuery.of(context).size.width *
+                                              0.6,
+                                      chartValuesOptions: ChartValuesOptions(
+                                        showChartValues: false,
+                                        showChartValuesInPercentage: true,
+                                        showChartValueBackground: true,
+                                        showChartValuesOutside: true,
+                                        decimalPlaces: 0,
+                                        chartValueStyle: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily:
+                                              GoogleFonts.poppins().fontFamily,
+                                        ),
+                                      ),
+                                      legendOptions: LegendOptions(
+                                        showLegends: false,
+                                        legendPosition: LegendPosition.bottom,
+                                        legendShape: BoxShape.circle,
+                                        legendTextStyle: TextStyle(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 12,
+                                          fontFamily:
+                                              GoogleFonts.poppins().fontFamily,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                '${sum.toStringAsFixed(0)}',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 36,
+                                  fontFamily:
+                                      GoogleFonts.singleDay().fontFamily,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
+                              Text(
+                                '\n \n total count',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: GoogleFonts.poppins().fontFamily,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.black,
+                                ),
+                              ),
+                                ],
+                              ),
+                              // Render progress bars with value 0 for each mood
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 30),
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: moodColors.entries.map((entry) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 5.0),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            width: 20,
+                                            height: 20,
+                                            color:
+                                                entry.value, // Use mood color
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  entry.key,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Stack(
+                                                  children: [
+                                                    Container(
+                                                      height: 10,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.grey[300],
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5),
+                                                      ),
+                                                    ),
+                                                    FractionallySizedBox(
+                                                      widthFactor:
+                                                          0, // Set width factor to 0
+                                                      child: Container(
+                                                        height: 10,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: entry
+                                                              .value, // Use mood color
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      '0', // Set count to 0
+                                                      style: const TextStyle(
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '0%', // Set percentage to 0
+                                                      style: const TextStyle(
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ],
                           ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 30),
