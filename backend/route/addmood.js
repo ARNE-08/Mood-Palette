@@ -3,12 +3,13 @@ const jwt = require("jsonwebtoken");
 
 module.exports = async (req, res) => {
     try {
+        const { mood, log_date } = req.body;
         const token = req.body.user_id;
         var decoded = jwt.verify(token, "ZJGX1QL7ri6BGJWj3t");
         const user_id = decoded.userId;
 
-        const getMood = mysql.format("SELECT * FROM mood WHERE user_id = ?", [user_id]);
-        connection.query(getMood, (err, rows) => {
+        const addMood = mysql.format("INSERT INTO mood (user_id, date, mood) VALUES (?, ? ?)", [user_id, log_date, mood]);
+        connection.query(addMood, (err, rows) => {
             if (err) {
                 return res.status(400).json({
                     success: false,
@@ -16,16 +17,6 @@ module.exports = async (req, res) => {
                     error: err.message,
                 });
             }
-
-            // Add one day to each date
-            rows = rows.map(row => {
-                const date = new Date(row.date);
-                date.setDate(date.getDate() + 1); // Add one day
-                return {
-                    ...row,
-                    date: date.toISOString().split('T')[0] // Format date to string
-                };
-            });
 
             return res.status(200).json({
                 success: true,
