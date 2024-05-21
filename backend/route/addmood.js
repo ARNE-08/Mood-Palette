@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
         var decoded = jwt.verify(token, "ZJGX1QL7ri6BGJWj3t");
         const user_id = decoded.userId;
 
-        const addMood = mysql.format("INSERT INTO mood (user_id, date, mood) VALUES (?, ? ?)", [user_id, log_date, mood]);
+        const addMood = mysql.format("INSERT INTO mood (user_id, date, mood) VALUES (?, ?, ?)", [user_id, log_date, mood]);
         connection.query(addMood, (err, rows) => {
             if (err) {
                 return res.status(400).json({
