@@ -3,6 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mood_palette/widget/navbar.dart';
 import 'dart:math';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:mood_palette/main.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,10 +21,76 @@ class _HomePageState extends State<HomePage> {
 
   DateTime _currentMonth = DateTime.now().subtract(const Duration(days: 1));
   bool selectedcurrentyear = false;
+  List<dynamic> moodData = [];
+
   @override
   void initState() {
     super.initState();
+    fetchMoodData();
   }
+
+  void fetchMoodData() async {
+    try {
+      // Make the HTTP POST request
+      final response = await http.post(
+        Uri.parse('http://localhost:3000/getmood'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${GlobalVariables.instance.token}',
+        },
+        body: jsonEncode({
+          'user_id': GlobalVariables.instance.token
+        }), // Empty body or pass any required data
+      );
+
+      // Check if the request was successful (status code 200)
+      if (response.statusCode == 200) {
+        // Parse the JSON response directly into a list of maps
+        print('Succeed to fetch mood data: ${response.statusCode}');
+        final Map<String, dynamic> fetchedMoodData = json.decode(response.body);
+        print('fetchedd mood data: ${fetchedMoodData['data']}');
+        // Store the fetched mood data in the moodData list
+        setState(() {
+          moodData = fetchedMoodData['data'];
+          // print(moodData);
+        });
+      } else {
+        // Handle other status codes (e.g., 400, 401, etc.)
+        print('Failed to fetch mood data: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle any errors that occur during the process
+      print('Error fetching mood data: $error');
+    }
+  }
+
+void addMood(String mood) async {
+  try {
+    final response = await http.post(
+      Uri.parse('http://localhost:3000/addmood'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${GlobalVariables.instance.token}',
+      },
+      body: jsonEncode({
+        'user_id': GlobalVariables.instance.token,
+        'mood': mood,
+        'log_date': DateTime.now().toIso8601String(),
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Mood added successfully: ${response.statusCode}');
+      fetchMoodData();
+      setState(() {});
+    } else {
+      print('Failed to add mood: ${response.statusCode}');
+    }
+  } catch (error) {
+    print('Error adding mood: $error');
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +137,7 @@ class _HomePageState extends State<HomePage> {
               itemBuilder: (context, pageIndex) {
                 DateTime month =
                     DateTime(_currentMonth.year, (pageIndex % 12) + 1, 1);
-                return buildCalendar(month);
+                return buildCalendar(month, moodData);
               },
             ),
           ),
@@ -112,22 +181,22 @@ class _HomePageState extends State<HomePage> {
                   }
                 },
               ),
-              DropdownButton<String>(
+              DropdownButton<int>(
                 // Dropdown for selecting a month
                 underline: const SizedBox(),
                 dropdownColor: Colors.grey[700],
                 iconSize: 0.0,
                 style: const TextStyle(color: Colors.white),
-                value: DateFormat('MMMM').format(_currentMonth),
-                onChanged: (String? selectedMonth) {
+                value: _currentMonth.month,
+                onChanged: (int? selectedMonth) {
                   if (selectedMonth != null) {
                     setState(() {
                       // Updates the current month based on the selected month
-                      _currentMonth = DateTime.parse(
-                          '${DateTime.now().year}-$selectedMonth-01');
+                      _currentMonth =
+                          DateTime(_currentMonth.year, selectedMonth, 1);
 
                       // Calculates the month index based on the selected month and sets the page
-                      int monthIndex = _currentMonth.month - 1;
+                      int monthIndex = selectedMonth - 1;
                       _pageController.jumpToPage(monthIndex);
                     });
                   }
@@ -135,11 +204,12 @@ class _HomePageState extends State<HomePage> {
                 items: [
                   // Generates DropdownMenuItems for each month
                   for (int month = 1; month <= 12; month++)
-                    DropdownMenuItem<String>(
-                      value: DateFormat('MMMM')
-                          .format(DateTime(DateTime.now().year, month, 1)),
-                      child: Text(DateFormat('MMMM')
-                          .format(DateTime(DateTime.now().year, month, 1))),
+                    DropdownMenuItem<int>(
+                      value: month,
+                      child: Text(
+                        DateFormat('MMMM')
+                            .format(DateTime(_currentMonth.year, month, 1)),
+                      ),
                     ),
                 ],
               ),
@@ -228,9 +298,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  //  Widget _buildCalendar() {--}
-  // This widget builds the detailed calendar grid for the chosen month.
-  Widget buildCalendar(DateTime month) {
+  // Modify the _buildCalendar method to accept mood data
+  Widget buildCalendar(DateTime month, List<dynamic> moodData) {
     // Calculating various details for the month's display
     int daysInMonth = DateTime(month.year, month.month + 1, 0).day;
     DateTime firstDayOfMonth = DateTime(month.year, month.month, 1);
@@ -238,20 +307,21 @@ class _HomePageState extends State<HomePage> {
 
     DateTime lastDayOfPreviousMonth =
         firstDayOfMonth.subtract(const Duration(days: 1));
+
     int daysInPreviousMonth = lastDayOfPreviousMonth.day;
-    List<Color> randomColors = [
-      const Color.fromRGBO(225, 0, 34, 1),
-      const Color.fromRGBO(0, 5, 133, 1),
-      const Color.fromRGBO(89, 251, 234, 1),
-      const Color.fromRGBO(129, 58, 173, 1),
-      const Color.fromRGBO(252, 169, 255, 1),
-      const Color.fromRGBO(157, 156, 194, 1),
-      const Color.fromRGBO(0, 148, 122, 1),
-      const Color.fromRGBO(254, 105, 0, 1),
-      const Color.fromRGBO(255, 245, 0, 1),
-      const Color.fromRGBO(0, 153, 218, 1),
-      const Color.fromRGBO(108, 217, 164, 1),
-    ];
+
+    bool checkMoodDataForToday() {
+      DateTime today = DateTime.now();
+      return moodData.any((mood) {
+        DateTime moodDate = DateTime.parse(mood['date']);
+        return moodDate.year == today.year &&
+            moodDate.month == today.month &&
+            moodDate.day == today.day;
+      });
+    }
+
+    // Store the result in the hasMoodDataForToday variable
+    bool hasMoodDataForToday = checkMoodDataForToday();
 
     return GridView.builder(
       padding: const EdgeInsets.all(8.0),
@@ -259,71 +329,120 @@ class _HomePageState extends State<HomePage> {
         crossAxisCount: 7,
         childAspectRatio: 1,
       ),
-      // Calculating the total number of cells required in the grid
       itemCount: daysInMonth + weekdayOfFirstDay - 1,
       itemBuilder: (context, index) {
         if (index < weekdayOfFirstDay - 1) {
-          // Displaying dates from the previous month in grey
+          // Calculate the day from the previous month
           int previousMonthDay =
-              daysInPreviousMonth - (weekdayOfFirstDay - index) + 2;
+              daysInPreviousMonth - (weekdayOfFirstDay - 1) + index;
           DateTime date =
-              DateTime(month.year, month.month, index - weekdayOfFirstDay + 2);
+              DateTime(month.year, month.month - 1, previousMonthDay);
 
           return buildDayContainer(
-              previousMonthDay,
-              const Color.fromRGBO(217, 217, 217, 1),
-              date); // Function to build day container
+              previousMonthDay, const Color.fromRGBO(217, 217, 217, 1), date, hasMoodDataForToday);
         } else {
-          // Displaying the current month's days
+          // Calculate the day within the current month
           DateTime date =
               DateTime(month.year, month.month, index - weekdayOfFirstDay + 2);
-          // ! set to generate color to the day before today
-          Color dayColor = date.isBefore(DateTime.now().subtract(Duration(days: 1)))
-              ? randomColors[Random().nextInt(randomColors.length)]
-              : const Color.fromRGBO(217, 217, 217, 1); // Check if the date is before yesterday
- // Check if the date is before today
-          String text = date.day.toString();
+          Color dayColor = const Color.fromRGBO(217, 217, 217, 1);
+
+          // Check if the mood data contains a mood for the current date
+          Map<String, dynamic>? mood = moodData.firstWhere(
+            (mood) =>
+                DateTime.parse(mood['date']).year == date.year &&
+                DateTime.parse(mood['date']).month == date.month &&
+                DateTime.parse(mood['date']).day == date.day,
+            orElse: () =>
+                <String, dynamic>{}, // return an empty map instead of null
+          );
+          // If mood data exists, determine the color based on the mood
+          if (mood != null) {
+            // print('Mood: ${mood['mood']}');
+            switch (mood['mood']) {
+              case 'Angry':
+                dayColor = const Color.fromRGBO(255, 0, 34, 1);
+                break;
+              case 'Sad':
+                dayColor = const Color.fromRGBO(0, 5, 133, 1);
+                break;
+              case 'Calm':
+                dayColor = const Color.fromRGBO(89, 251, 234, 1);
+                break;
+              case 'Worried':
+                dayColor = const Color.fromRGBO(129, 58, 173, 1);
+                break;
+              case 'Embarrassed':
+                dayColor = const Color.fromRGBO(252, 169, 255, 1);
+                break;
+              case 'Uncomfortable':
+                dayColor = const Color.fromRGBO(157, 156, 194, 1);
+                break;
+              case 'Confused':
+                dayColor = const Color.fromRGBO(0, 148, 122, 1);
+                break;
+              case 'Excited':
+                dayColor = const Color.fromRGBO(254, 105, 0, 1);
+                break;
+              case 'Happy':
+                dayColor = const Color.fromRGBO(255, 245, 0, 1);
+                break;
+              case 'Bored':
+                dayColor = const Color.fromRGBO(0, 153, 218, 1);
+                break;
+              case 'Chill':
+                dayColor = const Color.fromRGBO(108, 217, 164, 1);
+                break;
+              default:
+                // Handle unknown mood
+                dayColor = const Color.fromRGBO(217, 217, 217, 1);
+                break;
+            }
+          }
 
           return InkWell(
             onTap: () {
               // Handle tap on a date cell
             },
-            child: buildDayContainer(
-                text, dayColor, date), // Function to build day container
+            child: buildDayContainer(date.day, dayColor, date, hasMoodDataForToday),
           );
         }
       },
     );
   }
 
-  Widget buildDayContainer(dynamic content, Color color, DateTime date) {
+  Widget buildDayContainer(dynamic content, Color color, DateTime date, bool hasMoodDataForToday) {
     // Check if the date is today
     bool isToday = date.year == DateTime.now().year &&
         date.month == DateTime.now().month &&
         date.day == DateTime.now().day;
+
+    bool isTomorrow = date.year == DateTime.now().year &&
+        date.month == DateTime.now().month &&
+        date.day == DateTime.now().day + 1;
 
     return Padding(
       padding: const EdgeInsets.all(0.0),
       child: GestureDetector(
         onTap: () {
           if (isToday) {
-            // Handle tap to show bottom sheet
             showModalBottomSheet(
               context: context,
+              backgroundColor: const Color.fromRGBO(255, 209, 227, 1),
+              isScrollControlled: true,
               builder: (context) {
-                // Replace this with your bottom sheet widget
                 return ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(45),
+                    topRight: Radius.circular(45),
                   ),
                   child: Container(
-                    color: Color.fromRGBO(255, 209, 227, 1),
+                    color: const Color.fromRGBO(255, 209, 227, 1),
                     height: 500,
                     width: double.infinity,
+
                     child: Column(
                       children: [
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Container(
                           padding: const EdgeInsets.all(8.0),
                           width: 305,
@@ -342,7 +461,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 20), // Add space between the header and the blocks
+                        const SizedBox(height: 20), // Add space between the header and the blocks
                         Wrap(
                           alignment: WrapAlignment.spaceEvenly,
                           children: [
@@ -378,7 +497,17 @@ class _HomePageState extends State<HomePage> {
                   color: color,
                 ),
                 child: Center(
-                  child: isToday ? Icon(Icons.add, color: Colors.white) : null,
+                  child: (() {
+                    if (isTomorrow && hasMoodDataForToday) {
+                      return const Icon(Icons.add, color: Colors.white);
+                      // } else if (isTomorrow && !hasMoodDataForTomorrow) {
+                      //   return const Icon(Icons.add, color: Colors.white);
+                    } else if (isToday && !hasMoodDataForToday) {
+                      return const Icon(Icons.add, color: Colors.white);
+                    } else {
+                      return null;
+                    }
+                  })(),
                 ),
               ),
             ),
@@ -386,7 +515,7 @@ class _HomePageState extends State<HomePage> {
                 height: 2), // Adjust spacing between the box and the text
             Text(
               content.toString(),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 10.0,
                 color: Colors.black,
               ),
@@ -400,28 +529,32 @@ class _HomePageState extends State<HomePage> {
   Widget _buildColorBlock(int colorValue, String text) {
     Color color = Color(colorValue);
     return Padding(
-      padding: const EdgeInsets.all(
-          8.0), // Add padding to create space between blocks
-      child: Column(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius:
-                  BorderRadius.circular(8), // Adjust the radius as needed
+      padding: const EdgeInsets.all(8.0), // Add padding to create space between blocks
+      child: GestureDetector(
+        onTap: () {
+            addMood(text);
+        },
+        child: Column(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius:
+                    BorderRadius.circular(8), // Adjust the radius as needed
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            text,
-            style: GoogleFonts.poppins(
-              // Use Google Fonts
-              fontSize: 12,
+            const SizedBox(height: 10),
+            Text(
+              text,
+              style: GoogleFonts.poppins(
+                // Use Google Fonts
+                fontSize: 12,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
