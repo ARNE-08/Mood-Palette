@@ -563,7 +563,7 @@ class _StatPageState extends State<StatPage> {
               children: [
                 const SizedBox(height: 40),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 400),
+                  padding: const EdgeInsets.symmetric(horizontal: 450),
                   child: Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
