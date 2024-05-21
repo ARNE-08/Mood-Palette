@@ -598,7 +598,7 @@ class _StatPageState extends State<StatPage> {
                                   chartType: ChartType.ring,
                                   ringStrokeWidth: 60,
                                   chartRadius:
-                                      MediaQuery.of(context).size.width * 0.6,
+                                      MediaQuery.of(context).size.width * 0.3,
                                   chartValuesOptions: ChartValuesOptions(
                                     showChartValues: false,
                                     showChartValuesInPercentage: true,
