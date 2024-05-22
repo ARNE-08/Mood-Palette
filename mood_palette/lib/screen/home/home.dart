@@ -118,12 +118,10 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: const Color.fromRGBO(255, 254, 234, 1),
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: const Color.fromRGBO(
-            255, 254, 234, 1), // Set background color to match the container
+        backgroundColor: const Color.fromRGBO(255, 254, 234, 1), // Set background color to match the container
         elevation: 0, // Remove the elevation
         title: Padding(
-          padding: const EdgeInsets.only(
-              top: 30), // Adjust top padding to move the text down
+          padding: const EdgeInsets.only(top: 30), // Adjust top padding to move the text down
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -164,8 +162,7 @@ class _HomePageState extends State<HomePage> {
                               DateTime(_currentMonth.year, index + 1, 1);
                         });
                       },
-                      itemCount:
-                          12 * 10, // Show 10 years, adjust this count as needed
+                      itemCount: 12 * 10, // Show 10 years, adjust this count as needed
                       itemBuilder: (context, pageIndex) {
                         DateTime month = DateTime(
                             _currentMonth.year, (pageIndex % 12) + 1, 1);
@@ -329,7 +326,10 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.only(right: 8.0),
       child: Text(
         day,
-        style: const TextStyle(fontWeight: FontWeight.bold),
+        style: GoogleFonts.poppins(
+                // Use Google Fonts
+                fontSize: 15,
+        ),
       ),
     );
   }
@@ -468,8 +468,7 @@ class _HomePageState extends State<HomePage> {
                   physics: const ClampingScrollPhysics(),
                   child: Container(
                     constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height *
-                          0.6, // Set maximum height to 60% of the screen height
+                      maxHeight: MediaQuery.of(context).size.height * 0.6, // Set maximum height to 60% of the screen height
                     ),
                     child: ClipRRect(
                       borderRadius: const BorderRadius.only(
@@ -479,8 +478,7 @@ class _HomePageState extends State<HomePage> {
                       child: Container(
                         color: const Color.fromRGBO(255, 209, 227, 1),
                         width: double.infinity,
-                        padding: const EdgeInsets.all(
-                            10), // Add internal padding for content
+                        padding: const EdgeInsets.all(10), // Add internal padding for content
                         child: Column(
                           children: [
                             const SizedBox(height: 20),
@@ -501,8 +499,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                             ),
-                            const SizedBox(
-                                height: 20), // Add space between the header and the blocks
+                            const SizedBox(height: 20), // Add space between the header and the blocks
                             Wrap(
                               alignment: WrapAlignment.spaceEvenly, // Remove any extra padding around the grid
                               spacing: 20, // Adjust horizontal spacing between blocks
@@ -552,7 +549,7 @@ class _HomePageState extends State<HomePage> {
                   width: size,
                   height: size,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(3),
+                    borderRadius: BorderRadius.circular(0),
                     color: color,
                   ),
                   child: Center(
@@ -566,7 +563,7 @@ class _HomePageState extends State<HomePage> {
                               date.month == DateTime.now().month &&
                               date.day == DateTime.now().day) &&
                           !hasMoodDataForToday) {
-                        return const Icon(Icons.add, color: Colors.white);
+                        return const Icon(Icons.add, color: Color.fromRGBO(126, 161, 255, 1));
                       } else {
                         return null;
                       }
@@ -575,8 +572,7 @@ class _HomePageState extends State<HomePage> {
                 );
               },
             ),
-            const SizedBox(
-                height: 3), // Adjust spacing between the box and the text
+            const SizedBox(height: 3), // Adjust spacing between the box and the text
             Text(
               content.toString(),
               style: const TextStyle(
@@ -615,7 +611,7 @@ class _HomePageState extends State<HomePage> {
               text,
               style: GoogleFonts.poppins(
                 // Use Google Fonts
-                fontSize: 12,
+                fontSize: text == "Uncomfortable" ? 9 : 12,
               ),
             ),
           ],
