@@ -153,6 +153,7 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 children: [
                   _buildHeader(),
+                  const SizedBox(height: 20), // Add space between the header and the weeks
                   _buildWeeks(),
                   Expanded(
                     child: PageView.builder(
@@ -438,9 +439,6 @@ class _HomePageState extends State<HomePage> {
           }
 
           return InkWell(
-            onTap: () {
-              // Handle tap on a date cell
-            },
             child: buildDayContainer(
                 date.day, dayColor, date, hasMoodDataForToday),
           );
@@ -456,10 +454,6 @@ class _HomePageState extends State<HomePage> {
         date.month == DateTime.now().month &&
         date.day == DateTime.now().day;
 
-    bool isTomorrow = date.year == DateTime.now().year &&
-        date.month == DateTime.now().month &&
-        date.day == DateTime.now().day + 1;
-
     return Padding(
       padding: const EdgeInsets.all(0.0),
       child: GestureDetector(
@@ -471,7 +465,7 @@ class _HomePageState extends State<HomePage> {
               isScrollControlled: true,
               builder: (context) {
                 return SingleChildScrollView(
-                  physics: ClampingScrollPhysics(),
+                  physics: const ClampingScrollPhysics(),
                   child: Container(
                     constraints: BoxConstraints(
                       maxHeight: MediaQuery.of(context).size.height *
@@ -508,8 +502,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                             const SizedBox(
-                                height:
-                                    20), // Add space between the header and the blocks
+                                height: 20), // Add space between the header and the blocks
                             Wrap(
                               alignment: WrapAlignment.spaceEvenly, // Remove any extra padding around the grid
                               spacing: 20, // Adjust horizontal spacing between blocks
@@ -600,7 +593,8 @@ class _HomePageState extends State<HomePage> {
   Widget _buildColorBlock(int colorValue, String text) {
     Color color = Color(colorValue);
     return Padding(
-      padding: const EdgeInsets.all(0.0), // Add padding to create space between blocks
+      padding: const EdgeInsets.all(
+          8.0), // Add padding to create space between blocks
       child: GestureDetector(
         onTap: () {
           addMood(text);
@@ -608,8 +602,8 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             Container(
-              width: 50,
-              height: 50,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 color: color,
                 borderRadius:
