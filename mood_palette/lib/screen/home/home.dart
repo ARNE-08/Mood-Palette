@@ -64,36 +64,57 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-void addMood(String mood) async {
-  try {
-    final response = await http.post(
-      Uri.parse('http://localhost:3000/addmood'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${GlobalVariables.instance.token}',
-      },
-      body: jsonEncode({
-        'user_id': GlobalVariables.instance.token,
-        'mood': mood,
-        'log_date': DateTime.now().toIso8601String(),
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      print('Mood added successfully: ${response.statusCode}');
-      fetchMoodData();
-      setState(() {});
-    } else {
-      print('Failed to add mood: ${response.statusCode}');
-    }
-  } catch (error) {
-    print('Error adding mood: $error');
+  bool hasLoggedMoodForToday() {
+    DateTime today = DateTime.now();
+    return moodData.any((mood) {
+      DateTime moodDate = DateTime.parse(mood['date']);
+      return moodDate.year == today.year &&
+          moodDate.month == today.month &&
+          moodDate.day == today.day;
+    });
   }
-}
 
+  void addMood(String mood) async {
+    Navigator.of(context).pop();
+    if (hasLoggedMoodForToday()) {
+      // Show a message that the user has already logged a mood today
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You have already logged your mood today.'),
+        ),
+      );
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:3000/addmood'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${GlobalVariables.instance.token}',
+        },
+        body: jsonEncode({
+          'user_id': GlobalVariables.instance.token,
+          'mood': mood,
+          'log_date': DateTime.now().toIso8601String(),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Mood added successfully: ${response.statusCode}');
+        fetchMoodData();
+        setState(() {});
+      } else {
+        print('Failed to add mood: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error adding mood: $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    // final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: const Color.fromRGBO(255, 254, 234, 1),
       appBar: AppBar(
@@ -121,28 +142,35 @@ void addMood(String mood) async {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          _buildHeader(),
-          _buildWeeks(),
-          Expanded(
-            child: PageView.builder(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentMonth = DateTime(_currentMonth.year, index + 1, 1);
-                });
-              },
-              itemCount: 12 * 10, // Show 10 years, adjust this count as needed
-              itemBuilder: (context, pageIndex) {
-                DateTime month =
-                    DateTime(_currentMonth.year, (pageIndex % 12) + 1, 1);
-                return buildCalendar(month, moodData);
-              },
-            ),
+      body: Center(
+        child: Container(
+          // constraints: const BoxConstraints(minWidth: 200.0, maxWidth: 800.0),
+          child: Column(
+            children: [
+              _buildHeader(),
+              _buildWeeks(),
+              Expanded(
+                child: PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentMonth =
+                          DateTime(_currentMonth.year, index + 1, 1);
+                    });
+                  },
+                  itemCount:
+                      12 * 10, // Show 10 years, adjust this count as needed
+                  itemBuilder: (context, pageIndex) {
+                    DateTime month =
+                        DateTime(_currentMonth.year, (pageIndex % 12) + 1, 1);
+                    return buildCalendar(month, moodData);
+                  },
+                ),
+              ),
+              const NavBar(),
+            ],
           ),
-          const NavBar(),
-        ],
+        ),
       ),
     );
   }
@@ -339,7 +367,10 @@ void addMood(String mood) async {
               DateTime(month.year, month.month - 1, previousMonthDay);
 
           return buildDayContainer(
-              previousMonthDay, const Color.fromRGBO(217, 217, 217, 1), date, hasMoodDataForToday);
+              previousMonthDay,
+              const Color.fromRGBO(217, 217, 217, 1),
+              date,
+              hasMoodDataForToday);
         } else {
           // Calculate the day within the current month
           DateTime date =
@@ -403,14 +434,16 @@ void addMood(String mood) async {
             onTap: () {
               // Handle tap on a date cell
             },
-            child: buildDayContainer(date.day, dayColor, date, hasMoodDataForToday),
+            child: buildDayContainer(
+                date.day, dayColor, date, hasMoodDataForToday),
           );
         }
       },
     );
   }
 
-  Widget buildDayContainer(dynamic content, Color color, DateTime date, bool hasMoodDataForToday) {
+  Widget buildDayContainer(
+      dynamic content, Color color, DateTime date, bool hasMoodDataForToday) {
     // Check if the date is today
     bool isToday = date.year == DateTime.now().year &&
         date.month == DateTime.now().month &&
@@ -439,7 +472,6 @@ void addMood(String mood) async {
                     color: const Color.fromRGBO(255, 209, 227, 1),
                     height: 500,
                     width: double.infinity,
-
                     child: Column(
                       children: [
                         const SizedBox(height: 20),
@@ -461,7 +493,9 @@ void addMood(String mood) async {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 20), // Add space between the header and the blocks
+                        const SizedBox(
+                            height:
+                                20), // Add space between the header and the blocks
                         Wrap(
                           alignment: WrapAlignment.spaceEvenly,
                           children: [
@@ -488,31 +522,48 @@ void addMood(String mood) async {
         },
         child: Column(
           children: [
-            Expanded(
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(3),
-                  color: color,
-                ),
-                child: Center(
-                  child: (() {
-                    if (isTomorrow && hasMoodDataForToday) {
-                      return const Icon(Icons.add, color: Colors.white);
-                      // } else if (isTomorrow && !hasMoodDataForTomorrow) {
-                      //   return const Icon(Icons.add, color: Colors.white);
-                    } else if (isToday && !hasMoodDataForToday) {
-                      return const Icon(Icons.add, color: Colors.white);
-                    } else {
-                      return null;
-                    }
-                  })(),
-                ),
-              ),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                double screenWidth = MediaQuery.of(context).size.width;
+                double size = screenWidth * 0.066;
+                if (screenWidth > 800) {
+                  size = screenWidth * 0.066;
+                } else if (screenWidth > 450 && screenWidth <= 600) {
+                  size = 40;
+                } else if (screenWidth >= 400) {
+                  size = 35;
+                } else {
+                  size = 30;
+                }
+                return Container(
+                  width: size,
+                  height: size,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: color,
+                  ),
+                  child: Center(
+                    child: (() {
+                      if ((date.year == DateTime.now().year &&
+                              date.month == DateTime.now().month &&
+                              date.day == DateTime.now().day + 1) &&
+                          hasMoodDataForToday) {
+                        return const Icon(Icons.add, color: Colors.white);
+                      } else if ((date.year == DateTime.now().year &&
+                              date.month == DateTime.now().month &&
+                              date.day == DateTime.now().day) &&
+                          !hasMoodDataForToday) {
+                        return const Icon(Icons.add, color: Colors.white);
+                      } else {
+                        return null;
+                      }
+                    })(),
+                  ),
+                );
+              },
             ),
             const SizedBox(
-                height: 2), // Adjust spacing between the box and the text
+                height: 3), // Adjust spacing between the box and the text
             Text(
               content.toString(),
               style: const TextStyle(
@@ -529,10 +580,11 @@ void addMood(String mood) async {
   Widget _buildColorBlock(int colorValue, String text) {
     Color color = Color(colorValue);
     return Padding(
-      padding: const EdgeInsets.all(8.0), // Add padding to create space between blocks
+      padding: const EdgeInsets.all(
+          8.0), // Add padding to create space between blocks
       child: GestureDetector(
         onTap: () {
-            addMood(text);
+          addMood(text);
         },
         child: Column(
           children: [
