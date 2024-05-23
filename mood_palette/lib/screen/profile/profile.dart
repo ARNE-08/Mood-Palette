@@ -7,17 +7,16 @@ import 'package:mood_palette/widget/loginbutton.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-// Assuming you have the GlobalVariables class defined somewhere
+// Define a class to hold global variables
 class GlobalVariables {
   static final instance = GlobalVariables._internal();
   String token;
 
-  GlobalVariables._internal()
-      : token = 'your_user_id'; // Replace with actual user ID initialization
+  GlobalVariables._internal() : token = ''; // Initialize token with empty string
 }
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  const ProfilePage({Key? key}) : super(key: key);
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -25,45 +24,99 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   TextEditingController _usernameController = TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Define _formKey
-  String currentUsername =
-      'USERNAME'; // Replace with the actual current username
-  bool _isEditing = false;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  String currentUsername = '';
+  bool _isEditing = false; // Include _isEditing variable
 
   @override
   void initState() {
     super.initState();
-    // Initialize the controller with the current username
-    _usernameController.text = currentUsername;
+    _fetchUsername();
   }
 
-  Future<void> updateUsername(String newUsername) async {
-    const apiUrl =
-        'http://localhost:3000/editusername'; // Assuming your backend is running on localhost
+  // Future<void> _fetchUsername() async {
+  //   try {
+  //     final apiUrl = 'http://localhost:3000/getusername';
+  //     final userId = GlobalVariables.instance.token;
 
-    // Retrieve user ID from GlobalVariables.instance.token
-    final userId = GlobalVariables.instance.token;
+  //     final response = await http.post(
+  //       Uri.parse(apiUrl),
+  //       body: {'user_id': userId},
+  //     );
 
-    final data = {'username': newUsername, 'user_id': userId};
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+  //       final username = data['data'][0]['username'];
+  //       setState(() {
+  //         currentUsername = username;
+  //         _usernameController.text = username;
+  //       });
+  //     } else {
+  //       print('Failed to fetch username: ${response.body}');
+  //     }
+  //   } catch (error) {
+  //     print('Error fetching username: $error');
+  //   }
+  // }
 
+  void _fetchUsername() async {
+  try {
     final response = await http.post(
-      Uri.parse(apiUrl),
-      body: json.encode(data),
-      headers: {'Content-Type': 'application/json'},
+      Uri.parse('http://localhost:3000/getusername'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${GlobalVariables.instance.token}',
+      },
+      body: jsonEncode({
+        'user_id': GlobalVariables.instance.token,
+      }),
     );
 
     if (response.statusCode == 200) {
-      print('Username updated successfully');
-      // Update UI or show a success message to the user
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      final String fetchedUsername = responseData['data'][0]['username'];
+      
       setState(() {
-        currentUsername = newUsername; // Update the current username
-        _isEditing = false; // Change back to non-editing mode
+        currentUsername = fetchedUsername;
       });
     } else {
-      print('Failed to update username: ${response.body}');
-      // Show an error message to the user
+      print('Failed to fetch username: ${response.statusCode}');
+    }
+  } catch (error) {
+    print('Error fetching username: $error');
+  }
+}
+
+
+  Future<void> updateUsername(String newUsername) async {
+    try {
+      final apiUrl = 'http://localhost:3000/editusername';
+      final userId = GlobalVariables.instance.token;
+
+      final data = {'username': newUsername, 'user_id': userId};
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: json.encode(data),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        print('Username updated successfully');
+        setState(() {
+          currentUsername = newUsername;
+          _isEditing = false; // Change _isEditing back to false
+        });
+      } else {
+        print('Failed to update username: ${response.body}');
+        // Handle error
+      }
+    } catch (error) {
+      print('Error updating username: $error');
+      // Handle error
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
