@@ -926,114 +926,120 @@ class _StatPageState extends State<StatPage> {
   }
 
   Widget _buildHeader() {
-    bool isLastMonthOfYear = _currentMonth.month == 12;
+  bool isLastMonthOfYear = _currentMonth.month == 12;
+  DateTime startMonth = DateTime(2024, 1, 1); // Set the start month and year
 
-    return Center(
-      child: Column(
-        children: [
-          const SizedBox(height: 70),
-          Container(
-            width: 215,
-            height: 35,
-            decoration: BoxDecoration(
-              color: const Color.fromRGBO(91, 188, 255, 1),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back_ios),
-                  color: Colors.white,
-                  iconSize: 12,
-                  onPressed: () {
-                    setState(() {
+  return Center(
+    child: Column(
+      children: [
+        const SizedBox(height: 70),
+        Container(
+          width: 215,
+          height: 35,
+          decoration: BoxDecoration(
+            color: const Color.fromRGBO(91, 188, 255, 1),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios),
+                color: Colors.white,
+                iconSize: 12,
+                onPressed: () {
+                  setState(() {
+                    if (_currentMonth.isAfter(startMonth)) {
                       _currentMonth = DateTime(
                           _currentMonth.year, _currentMonth.month - 1, 1);
                       fetchMoodData(_currentMonth.year, _currentMonth.month);
-                      int monthIndex = _currentMonth.month - 1;
+                      int monthIndex = (_currentMonth.year - startMonth.year) * 12 + _currentMonth.month - 1;
                       _pageController.jumpToPage(monthIndex);
-                    });
-                  },
-                ),
-                DropdownButton<int>(
-                  underline: const SizedBox(),
-                  dropdownColor: Colors.grey[700],
-                  iconSize: 0.0,
-                  style: const TextStyle(color: Colors.white),
-                  value: _currentMonth.month,
-                  onChanged: (int? selectedMonth) {
-                    if (selectedMonth != null) {
-                      setState(() {
-                        _currentMonth =
-                            DateTime(_currentMonth.year, selectedMonth, 1);
-                        fetchMoodData(_currentMonth.year, selectedMonth);
-                        int monthIndex = selectedMonth - 1;
-                        _pageController.jumpToPage(monthIndex);
-                      });
                     }
-                  },
-                  items: [
-                    for (int month = 1; month <= 12; month++)
-                      DropdownMenuItem<int>(
-                        value: month,
-                        child: Text(
-                          DateFormat('MMMM')
-                              .format(DateTime(_currentMonth.year, month, 1)),
-                        ),
-                      ),
-                  ],
-                ),
-                DropdownButton<int>(
-                  underline: const SizedBox(),
-                  style: const TextStyle(color: Colors.white),
-                  dropdownColor: Colors.grey[700],
-                  iconSize: 0.0,
-                  value: _currentMonth.year,
-                  onChanged: (int? year) {
-                    if (year != null) {
-                      setState(() {
-                        _currentMonth = DateTime(year, 1, 1);
-                        fetchMoodData(year, _currentMonth.month);
-                        int yearDiff = DateTime.now().year - year;
-                        int monthIndex =
-                            12 * yearDiff + _currentMonth.month - 1;
-                        _pageController.jumpToPage(monthIndex);
-                      });
-                    }
-                  },
-                  items: [
-                    for (int year = DateTime.now().year;
-                        year <= DateTime.now().year + 10;
-                        year++)
-                      DropdownMenuItem<int>(
-                        value: year,
-                        child: Text(
-                          year.toString(),
-                        ),
-                      ),
-                  ],
-                ),
-                IconButton(
-                  icon: const Icon(Icons.arrow_forward_ios),
-                  color: Colors.white,
-                  iconSize: 12,
-                  onPressed: () {
+                  });
+                },
+              ),
+              DropdownButton<int>(
+                underline: const SizedBox(),
+                dropdownColor: Colors.grey[700],
+                iconSize: 0.0,
+                style: const TextStyle(color: Colors.white),
+                value: _currentMonth.month,
+                onChanged: (int? selectedMonth) {
+                  if (selectedMonth != null) {
                     setState(() {
-                      _currentMonth = DateTime(
-                          _currentMonth.year, _currentMonth.month + 1, 1);
-                      fetchMoodData(_currentMonth.year, _currentMonth.month);
-                      int monthIndex = _currentMonth.month - 1;
-                      _pageController.jumpToPage(monthIndex);
+                      DateTime newDate = DateTime(_currentMonth.year, selectedMonth, 1);
+                      if (newDate.isAfter(startMonth) || newDate.isAtSameMomentAs(startMonth)) {
+                        _currentMonth = newDate;
+                        fetchMoodData(_currentMonth.year, selectedMonth);
+                        int monthIndex = (_currentMonth.year - startMonth.year) * 12 + selectedMonth - 1;
+                        _pageController.jumpToPage(monthIndex);
+                      }
                     });
-                  },
-                ),
-              ],
-            ),
+                  }
+                },
+                items: [
+                  for (int month = 1; month <= 12; month++)
+                    DropdownMenuItem<int>(
+                      value: month,
+                      child: Text(
+                        DateFormat('MMMM').format(DateTime(_currentMonth.year, month, 1)),
+                      ),
+                    ),
+                ],
+              ),
+              DropdownButton<int>(
+                underline: const SizedBox(),
+                style: const TextStyle(color: Colors.white),
+                dropdownColor: Colors.grey[700],
+                iconSize: 0.0,
+                value: _currentMonth.year,
+                onChanged: (int? year) {
+                  if (year != null) {
+                    setState(() {
+                      DateTime newDate = DateTime(year, _currentMonth.month, 1);
+                      if (newDate.isAfter(startMonth) || newDate.isAtSameMomentAs(startMonth)) {
+                        _currentMonth = newDate;
+                        fetchMoodData(year, _currentMonth.month);
+                        int monthIndex = (year - startMonth.year) * 12 + _currentMonth.month - 1;
+                        _pageController.jumpToPage(monthIndex);
+                      }
+                    });
+                  }
+                },
+                items: [
+                  for (int year = DateTime.now().year;
+                      year <= DateTime.now().year + 10;
+                      year++)
+                    DropdownMenuItem<int>(
+                      value: year,
+                      child: Text(
+                        year.toString(),
+                      ),
+                    ),
+                ],
+              ),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward_ios),
+                color: Colors.white,
+                iconSize: 12,
+                onPressed: () {
+                  setState(() {
+                    _currentMonth = DateTime(
+                        _currentMonth.year, _currentMonth.month + 1, 1);
+                    fetchMoodData(_currentMonth.year, _currentMonth.month);
+                    int monthIndex = (_currentMonth.year - startMonth.year) * 12 + _currentMonth.month - 1;
+                    _pageController.jumpToPage(monthIndex);
+                  });
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
 }
