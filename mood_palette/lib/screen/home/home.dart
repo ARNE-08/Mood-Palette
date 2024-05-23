@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mood_palette/widget/navbar.dart';
-import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:mood_palette/main.dart';
@@ -114,17 +113,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // final screenSize = MediaQuery.of(context).size;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: const Color.fromRGBO(255, 254, 234, 1),
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: const Color.fromRGBO(
-            255, 254, 234, 1), // Set background color to match the container
+        backgroundColor: const Color.fromRGBO(255, 254, 234, 1), // Set background color to match the container
         elevation: 0, // Remove the elevation
         title: Padding(
-          padding: const EdgeInsets.only(
-              top: 30), // Adjust top padding to move the text down
+          padding: const EdgeInsets.only(top: 30), // Adjust top padding to move the text down
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -143,33 +140,41 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: Center(
-        child: Container(
-          // constraints: const BoxConstraints(minWidth: 200.0, maxWidth: 800.0),
-          child: Column(
-            children: [
-              _buildHeader(),
-              _buildWeeks(),
-              Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: (index) {
-                    setState(() {
-                      _currentMonth =
-                          DateTime(_currentMonth.year, index + 1, 1);
-                    });
-                  },
-                  itemCount:
-                      12 * 10, // Show 10 years, adjust this count as needed
-                  itemBuilder: (context, pageIndex) {
-                    DateTime month =
-                        DateTime(_currentMonth.year, (pageIndex % 12) + 1, 1);
-                    return buildCalendar(month, moodData);
-                  },
-                ),
+        child: Column(
+          children: [
+            Container(
+              constraints: BoxConstraints(
+                  minWidth: 200.0,
+                  maxWidth: 800.0,
+                  minHeight: 200,
+                  maxHeight: screenHeight - 246),
+              child: Column(
+                children: [
+                  _buildHeader(),
+                  const SizedBox(height: 20), // Add space between the header and the weeks
+                  _buildWeeks(),
+                  Expanded(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentMonth =
+                              DateTime(_currentMonth.year, index + 1, 1);
+                        });
+                      },
+                      itemCount: 12 * 10, // Show 10 years, adjust this count as needed
+                      itemBuilder: (context, pageIndex) {
+                        DateTime month = DateTime(
+                            _currentMonth.year, (pageIndex % 12) + 1, 1);
+                        return buildCalendar(month, moodData);
+                      },
+                    ),
+                  ),
+                ],
               ),
-              const NavBar(),
-            ],
-          ),
+            ),
+            const NavBar(),
+          ],
         ),
       ),
     );
@@ -321,7 +326,10 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.only(right: 8.0),
       child: Text(
         day,
-        style: const TextStyle(fontWeight: FontWeight.bold),
+        style: GoogleFonts.poppins(
+                // Use Google Fonts
+                fontSize: 15,
+        ),
       ),
     );
   }
@@ -431,9 +439,6 @@ class _HomePageState extends State<HomePage> {
           }
 
           return InkWell(
-            onTap: () {
-              // Handle tap on a date cell
-            },
             child: buildDayContainer(
                 date.day, dayColor, date, hasMoodDataForToday),
           );
@@ -449,10 +454,6 @@ class _HomePageState extends State<HomePage> {
         date.month == DateTime.now().month &&
         date.day == DateTime.now().day;
 
-    bool isTomorrow = date.year == DateTime.now().year &&
-        date.month == DateTime.now().month &&
-        date.day == DateTime.now().day + 1;
-
     return Padding(
       padding: const EdgeInsets.all(0.0),
       child: GestureDetector(
@@ -463,56 +464,63 @@ class _HomePageState extends State<HomePage> {
               backgroundColor: const Color.fromRGBO(255, 209, 227, 1),
               isScrollControlled: true,
               builder: (context) {
-                return ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(45),
-                    topRight: Radius.circular(45),
-                  ),
+                return SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
                   child: Container(
-                    color: const Color.fromRGBO(255, 209, 227, 1),
-                    height: 500,
-                    width: double.infinity,
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 20),
-                        Container(
-                          padding: const EdgeInsets.all(8.0),
-                          width: 305,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(40),
-                          ),
-                          child: Center(
-                            child: Text(
-                              'How are you feeling today?',
-                              style: GoogleFonts.poppins(
-                                // Use Google Fonts
-                                fontSize: 16,
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.6, // Set maximum height to 60% of the screen height
+                    ),
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(45),
+                        topRight: Radius.circular(45),
+                      ),
+                      child: Container(
+                        color: const Color.fromRGBO(255, 209, 227, 1),
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(10), // Add internal padding for content
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 20),
+                            Container(
+                              padding: const EdgeInsets.all(8.0),
+                              width: 305,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(40),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'How are you feeling today?',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                        const SizedBox(
-                            height:
-                                20), // Add space between the header and the blocks
-                        Wrap(
-                          alignment: WrapAlignment.spaceEvenly,
-                          children: [
-                            _buildColorBlock(0xFFFF0022, 'Angry'),
-                            _buildColorBlock(0xFFFE6900, 'Excited'),
-                            _buildColorBlock(0xFFFFF500, 'Happy'),
-                            _buildColorBlock(0xFF9D9CC2, 'Uncomfortable'),
-                            _buildColorBlock(0xFF00947A, 'Confused'),
-                            _buildColorBlock(0xFF6CD9A4, 'Chill'),
-                            _buildColorBlock(0xFF59FBEA, 'Calm'),
-                            _buildColorBlock(0xFFFCA9FF, 'Embarassed'),
-                            _buildColorBlock(0xFF0099DA, 'Bored'),
-                            _buildColorBlock(0xFF000585, 'Sad'),
-                            _buildColorBlock(0xFF813AAD, 'Worried'),
+                            const SizedBox(height: 20), // Add space between the header and the blocks
+                            Wrap(
+                              alignment: WrapAlignment.spaceEvenly, // Remove any extra padding around the grid
+                              spacing: 20, // Adjust horizontal spacing between blocks
+                              runSpacing: 10, // Adjust vertical spacing between rows
+                              children: [
+                                _buildColorBlock(0xFFFF0022, 'Angry'),
+                                _buildColorBlock(0xFFFE6900, 'Excited'),
+                                _buildColorBlock(0xFFFFF500, 'Happy'),
+                                _buildColorBlock(0xFF9D9CC2, 'Uncomfortable'),
+                                _buildColorBlock(0xFF00947A, 'Confused'),
+                                _buildColorBlock(0xFF6CD9A4, 'Chill'),
+                                _buildColorBlock(0xFF59FBEA, 'Calm'),
+                                _buildColorBlock(0xFFFCA9FF, 'Embarassed'),
+                                _buildColorBlock(0xFF0099DA, 'Bored'),
+                                _buildColorBlock(0xFF000585, 'Sad'),
+                                _buildColorBlock(0xFF813AAD, 'Worried'),
+                              ],
+                            ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 );
@@ -526,9 +534,11 @@ class _HomePageState extends State<HomePage> {
               builder: (context, constraints) {
                 double screenWidth = MediaQuery.of(context).size.width;
                 double size = screenWidth * 0.066;
-                if (screenWidth > 800) {
+                if (screenWidth >= 1000) {
+                  size = 1000 * 0.066;
+                } else if (screenWidth >= 600) {
                   size = screenWidth * 0.066;
-                } else if (screenWidth > 450 && screenWidth <= 600) {
+                } else if (screenWidth >= 450) {
                   size = 40;
                 } else if (screenWidth >= 400) {
                   size = 35;
@@ -539,7 +549,7 @@ class _HomePageState extends State<HomePage> {
                   width: size,
                   height: size,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(3),
+                    borderRadius: BorderRadius.circular(0),
                     color: color,
                   ),
                   child: Center(
@@ -553,7 +563,7 @@ class _HomePageState extends State<HomePage> {
                               date.month == DateTime.now().month &&
                               date.day == DateTime.now().day) &&
                           !hasMoodDataForToday) {
-                        return const Icon(Icons.add, color: Colors.white);
+                        return const Icon(Icons.add, color: Color.fromRGBO(126, 161, 255, 1));
                       } else {
                         return null;
                       }
@@ -562,8 +572,7 @@ class _HomePageState extends State<HomePage> {
                 );
               },
             ),
-            const SizedBox(
-                height: 3), // Adjust spacing between the box and the text
+            const SizedBox(height: 3), // Adjust spacing between the box and the text
             Text(
               content.toString(),
               style: const TextStyle(
@@ -589,8 +598,8 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             Container(
-              width: 50,
-              height: 50,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 color: color,
                 borderRadius:
@@ -602,7 +611,7 @@ class _HomePageState extends State<HomePage> {
               text,
               style: GoogleFonts.poppins(
                 // Use Google Fonts
-                fontSize: 12,
+                fontSize: text == "Uncomfortable" ? 9 : 12,
               ),
             ),
           ],
