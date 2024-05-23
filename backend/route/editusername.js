@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const mysql = require("mysql");
 
 module.exports = async (req, res) => {

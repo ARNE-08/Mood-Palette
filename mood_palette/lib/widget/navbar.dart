@@ -24,7 +24,10 @@ class NavBar extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(context, '/statistic');
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => StatisticPage()), // Navigate to the StatisticPage
+                  // );
                 },
                 child: Column(
                   children: [
@@ -62,7 +65,10 @@ class NavBar extends StatelessWidget {
                   child: IconButton(
                     icon: const Icon(Icons.home),
                     onPressed: () {
-                      Navigator.pushNamed(context, '/');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomePage()), // Navigate to the HomePage
+                      );
                     },
                     color: Colors.white, // Color of the icon
                     iconSize: 45,
@@ -71,7 +77,10 @@ class NavBar extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(context, '/profile');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ProfilePage()), // Navigate to the ProfilePage
+                  );
                 },
                 child: Column(
                   children: [

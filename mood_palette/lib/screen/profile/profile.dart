@@ -1,47 +1,198 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart'; // Import Google Fonts
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mood_palette/main.dart';
 import 'package:mood_palette/screen/auth/login.dart';
 import 'package:mood_palette/widget/navbar.dart';
 import 'package:mood_palette/widget/loginbutton.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-class ProfilePage extends StatelessWidget {
-  // const ProfilePage({super.key});
+// Define a class to hold global variables
+class GlobalVariables {
+  static final instance = GlobalVariables._internal();
+  String token;
+
+  GlobalVariables._internal() : token = ''; // Initialize token with empty string
+}
+
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({Key? key}) : super(key: key);
+
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
   TextEditingController _usernameController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  String currentUsername = '';
+  bool _isEditing = false; // Include _isEditing variable
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsername();
+  }
+
+  // Future<void> _fetchUsername() async {
+  //   try {
+  //     final apiUrl = 'http://localhost:3000/getusername';
+  //     final userId = GlobalVariables.instance.token;
+
+  //     final response = await http.post(
+  //       Uri.parse(apiUrl),
+  //       body: {'user_id': userId},
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+  //       final username = data['data'][0]['username'];
+  //       setState(() {
+  //         currentUsername = username;
+  //         _usernameController.text = username;
+  //       });
+  //     } else {
+  //       print('Failed to fetch username: ${response.body}');
+  //     }
+  //   } catch (error) {
+  //     print('Error fetching username: $error');
+  //   }
+  // }
+
+  void _fetchUsername() async {
+  try {
+    final response = await http.post(
+      Uri.parse('http://localhost:3000/getusername'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${GlobalVariables.instance.token}',
+      },
+      body: jsonEncode({
+        'user_id': GlobalVariables.instance.token,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      final String fetchedUsername = responseData['data'][0]['username'];
+      
+      setState(() {
+        currentUsername = fetchedUsername;
+      });
+    } else {
+      print('Failed to fetch username: ${response.statusCode}');
+    }
+  } catch (error) {
+    print('Error fetching username: $error');
+  }
+}
+
+
+  Future<void> updateUsername(String newUsername) async {
+    try {
+      final apiUrl = 'http://localhost:3000/editusername';
+      final userId = GlobalVariables.instance.token;
+
+      final data = {'username': newUsername, 'user_id': userId};
+
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: json.encode(data),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        print('Username updated successfully');
+        setState(() {
+          currentUsername = newUsername;
+          _isEditing = false; // Change _isEditing back to false
+        });
+      } else {
+        print('Failed to update username: ${response.body}');
+        // Handle error
+      }
+    } catch (error) {
+      print('Error updating username: $error');
+      // Handle error
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80), // Set preferred height
+     appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
         child: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: const Color(0xFFFFD1E3), // Set AppBar color
+          backgroundColor: const Color(0xFFFFD1E3),
           flexibleSpace: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(height: 10),
-                Text(
-                  'USERNAME',
-                  style: GoogleFonts.singleDay(
-                    textStyle: TextStyle(
-                      fontSize: 36,
+            child: Form( // Wrap the TextField with a Form widget
+              key: _formKey, // Assign the _formKey
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (_isEditing)
+                    IconButton(
+                      icon: const Icon(Icons.check),
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          updateUsername(_usernameController.text);
+                        }
+                      },
                     ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _isEditing
+                        ? TextField(
+                            controller: _usernameController,
+                            maxLines: null,
+                            style: GoogleFonts.singleDay(
+                              textStyle: const TextStyle(
+                                fontSize: 36,
+                              ),
+                            ),
+                            decoration: const InputDecoration(
+                              hintText: 'Enter username',
+                            ),
+                            onChanged: (value) {
+                              setState(() {});
+                            },
+                          )
+                        : Text(
+                            currentUsername,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.singleDay(
+                              textStyle: const TextStyle(
+                                fontSize: 36,
+                              ),
+                            ),
+                          ),
                   ),
-                ),
-              ],
+                  if (!_isEditing)
+                    IconButton(
+                      icon: const Icon(Icons.edit_outlined),
+                      onPressed: () {
+                        setState(() {
+                          _isEditing = true;
+                        });
+                      },
+                    ),
+                ],
+              ),
             ),
           ),
         ),
       ),
+
       body: Stack(
         children: [
           Center(
             child: Column(
               // mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 Text(
                   'HAVE A NICE DAY!',
                   style: GoogleFonts.singleDay(
@@ -125,13 +276,15 @@ class ProfilePage extends StatelessWidget {
                     width: double.infinity,
                     onPressed: () {
                       // Navigate to the HomePage
-                      Navigator.pushNamed(context, '/login'); // Navigate to the HomePage
+                      Navigator.pushNamed(
+                          context, '/login'); // Navigate to the HomePage
                     },
                     borderRadius: BorderRadius.circular(50),
                     child: Text(
                       'LOGOUT',
                       style: GoogleFonts.poppins(
-                        textStyle: const TextStyle(fontSize: 20, color: Colors.white),
+                        textStyle:
+                            const TextStyle(fontSize: 20, color: Colors.white),
                       ),
                     ),
                   ),
@@ -199,8 +352,7 @@ class ProfilePage extends StatelessWidget {
             height: 40,
             decoration: BoxDecoration(
               color: color,
-              borderRadius:
-                  BorderRadius.circular(15), // Adjust the radius as needed
+              borderRadius: BorderRadius.circular(15), // Adjust the radius
             ),
           ),
           const SizedBox(height: 10),
