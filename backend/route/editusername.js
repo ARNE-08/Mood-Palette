@@ -1,4 +1,5 @@
 const mysql = require("mysql");
+const jwt = require("jsonwebtoken");
 
 module.exports = async (req, res) => {
     // ! how will we sent the user_id ? can we decode it from the cookie and send as body ?
