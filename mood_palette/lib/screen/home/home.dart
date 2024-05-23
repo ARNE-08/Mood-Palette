@@ -646,26 +646,31 @@ class _HomePageState extends State<HomePage> {
     return Padding(
       padding: const EdgeInsets.all(
           6.0), // Add padding to create space between blocks
-      child: Column(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius:
-                  BorderRadius.circular(15), // Adjust the radius as needed
+      child: GestureDetector(
+         onTap: () {
+          addMood(text);
+        },
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius:
+                    BorderRadius.circular(15), // Adjust the radius as needed
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            text,
-            style: GoogleFonts.poppins(
-              // Use Google Fonts
-              fontSize: 10,
+            const SizedBox(height: 10),
+            Text(
+              text,
+              style: GoogleFonts.poppins(
+                // Use Google Fonts
+                fontSize: 10,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -677,31 +682,36 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildlongColorBlock(int colorValue, String text) {
+Widget _buildlongColorBlock(int colorValue, String text) {
     Color color = Color(colorValue);
     return Padding(
       padding: const EdgeInsets.all(
           6.0), // Add padding to create space between blocks
-      child: Column(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius:
-                  BorderRadius.circular(15), // Adjust the radius as needed
+      child: GestureDetector(
+        onTap: () {
+          addMood(text);
+        },
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius:
+                    BorderRadius.circular(15), 
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            text,
-            style: GoogleFonts.poppins(
-              // Use Google Fonts
-              fontSize: 8,
+            const SizedBox(height: 10),
+            Text(
+              text,
+              style: GoogleFonts.poppins(
+                // Use Google Fonts
+                fontSize: 8,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
