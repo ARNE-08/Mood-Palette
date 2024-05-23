@@ -24,10 +24,10 @@ class NavBar extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => StatisticPage()), // Navigate to the StatisticPage
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => StatPage()), // Navigate to the StatisticPage
+                  );
                 },
                 child: Column(
                   children: [
