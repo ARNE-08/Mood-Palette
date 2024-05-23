@@ -276,64 +276,46 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   const SizedBox(height: 20),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
                     child: Container(
                       decoration: const BoxDecoration(),
                       child: Column(
                         children: [
                           Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        _buildColorBlock(0xFFFF0022, 'Angry'),
-                                        _buildColorBlock(0xFFFE6900, 'Excited'),
-                                        _buildColorBlock(0xFFFFF500, 'Happy'),
-                                        _buildlongColorBlock(
-                                            0xFF9D9CC2, 'Uncomfortable'),
-                                        _buildColorBlock(
-                                            0xFF00947A, 'Confused'),
-                                      ]
-                                          .map((widget) =>
-                                              Expanded(child: widget))
-                                          .toList(),
-                                    ),
-                                    const SizedBox(height: 20),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        _buildColorBlock(0xFF6CD9A4, 'Chill'),
-                                        _buildColorBlock(0xFF59FBEA, 'Calm'),
-                                        _buildlongColorBlock(
-                                            0xFFFCA9FF, 'Embarassed'),
-                                        _buildColorBlock(0xFF0099DA, 'Bored'),
-                                        _buildColorBlock(0xFF000585, 'Sad'),
-                                      ]
-                                          .map((widget) =>
-                                              Expanded(child: widget))
-                                          .toList(),
-                                    ),
-                                    const SizedBox(height: 20),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        _buildColorBlock(0xFF813AAD, 'Worried'),
-                                        _buildInvisibleColorBlock(),
-                                        _buildInvisibleColorBlock(),
-                                        _buildInvisibleColorBlock(),
-                                        _buildInvisibleColorBlock(),
-                                      ]
-                                          .map((widget) =>
-                                              Expanded(child: widget))
-                                          .toList(),
-                                    ),
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildColorBlock(0xFFFF0022, 'Angry'),
+                              _buildColorBlock(0xFFFE6900, 'Excited'),
+                              _buildColorBlock(0xFFFFF500, 'Happy'),
+                              _buildlongColorBlock(0xFF9D9CC2, 'Uncomfortable'),
+                              _buildColorBlock(0xFF00947A, 'Confused'),
+                            ].map((widget) => Expanded(child: widget)).toList(),
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildColorBlock(0xFF6CD9A4, 'Chill'),
+                              _buildColorBlock(0xFF59FBEA, 'Calm'),
+                              _buildlongColorBlock(0xFFFCA9FF, 'Embarassed'),
+                              _buildColorBlock(0xFF0099DA, 'Bored'),
+                              _buildColorBlock(0xFF000585, 'Sad'),
+                            ].map((widget) => Expanded(child: widget)).toList(),
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildColorBlock(0xFF813AAD, 'Worried'),
+                              _buildInvisibleColorBlock(),
+                              _buildInvisibleColorBlock(),
+                              _buildInvisibleColorBlock(),
+                              _buildInvisibleColorBlock(),
+                            ].map((widget) => Expanded(child: widget)).toList(),
+                          ),
                         ],
                       ),
                     ),
